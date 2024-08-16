@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "938319022397",
+    "project_id": "cropsync-ed120",
+    "storage_bucket": "cropsync-ed120.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:938319022397:android:9099b8e0c9c1ff933b1d54",
+        "android_client_info": {
+          "package_name": "com.example.panache14"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCwtLozR3uRV194CFVmNSVGezA3MvbGrZQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

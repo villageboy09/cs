@@ -1,30 +1,27 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:panache14/main.dart';
-
+import 'package:cropsync/controller/language_change_controller.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('Language change test', (WidgetTester tester) async {
+    // Create a LanguageChangeController instance and initialize it with English
+    LanguageChangeController languageController = LanguageChangeController();
+    await languageController.initLanguage('en');
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    // Build the MyApp widget with the initialized LanguageChangeController
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    // Verify that the default language is English
+    expect(languageController.appLocale?.languageCode, 'en');
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // Tap on the PopupMenuButton to open the menu
+    await tester.tap(find.byType(PopupMenuButton));
+    await tester.pumpAndSettle();
+
+    // Tap on the Hindi option in the menu
+    await tester.tap(find.text('हिन्दी'));
+    await tester.pumpAndSettle();
+
+    // Verify that the language has changed to Hindi
+    expect(languageController.appLocale?.languageCode, 'hi');
   });
 }

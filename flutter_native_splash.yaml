@@ -1,0 +1,5 @@
+flutter_native_splash:
+  color: "#FFFFFF" # Background color of the splash screen
+  image: "assets/S.png" # Path to your launcher icon
+  android: true # Generate splash screen for Android
+  ios: true # Generate splash screen for iOS

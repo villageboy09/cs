@@ -1,0 +1,20 @@
+class WheatData {
+    static String soilType = "Loamy Soil";
+    static String seedRate = "50 kg/acre";
+    static String seedTreatment = "Seed treatment with Carboxin (75 WP @ 2.5 gm/kg seed) or Carbendazim (50 WP @ 2.5 gm/kg seed) or Tebuconazole (2DS @ 1.25 gm/kg seed) or a combination of a reduced dosage of Carboxin (75 WP @ 1.25 gm/kg seed) and a bioagent fungus Trichoderma viride (@ 4 gm/kg seed) is recommended.";
+
+    static String growingSeason = "November - December";
+    static String cropDuration = "120-150 days";
+
+    static String irrigationSchedule = "Pre-sowing: Ensure adequate soil moisture for seed germination. Pre-irrigation may be necessary in dry soil conditions.\nInitial growth stage (tillering): Irrigate every 10-15 days to support early growth and tiller development.\nJointing to booting stage: Maintain soil moisture with irrigation every 10-12 days.\nHeading to maturity: Irrigate every 10-14 days, adjusting based on weather and soil moisture conditions.\nReduce irrigation: Reduce irrigation frequency during grain filling to avoid lodging and promote grain development.";
+
+    static String nutrientRequirement = "Nitrogen (N): 80-100 kg\nPhosphorus (P): 40-50 kg\nPotassium (K): 30-40 kg";
+
+    static String weedManagement = "Cultural Practices: Crop rotation, proper seedbed preparation, and optimal planting density help suppress weeds in wheat fields.\nMechanical Control: Hand weeding, inter-row cultivation, and shallow tillage can effectively manage weeds in wheat crops.\nChemical Control:\nPre-emergence herbicides: Pendimethalin, Metribuzin, and Clodinafop-propargyl are commonly used pre-emergence herbicides for weed control in wheat.\nPost-emergence herbicides: Post-emergence herbicides like 2,4-D, Metsulfuron-methyl, and Bromoxynil are used to control emerged weeds in wheat fields.";
+
+    static String diseaseAndPestManagement = "Disease Management Guidelines:\nRust:\nSymptoms: Yellow or brown powdery pustules on leaves.\nControl: Spray with Propiconazole or Tebuconazole at 0.1% concentration at the initiation of rust using 200 litres of water per acre.\nLoose Smut:\nSymptoms: Ears turn into a black powdery mass.\nControl: Treat seeds with Carboxin, Carbendazim, or Tebuconazole.\nKarnal Bunt:\nSymptoms: Black powder on infected grains.\nControl: Spray Propiconazole at 0.1% concentration at 50% flowering, repeat if needed every 15 days.\nPowdery Mildew:\nSymptoms: White powdery patches on leaves and stems.\nControl: Spray with Propiconazole at 0.1% concentration when disease appears.\nFlag Smut:\nSymptoms: Long black streaks on leaves.\nControl: Follow seed treatment with Carboxin or Tebuconazole.\nPests:\nTermites:\nSymptoms: Damage near sowing and maturity.\nControl: Treat seeds with thiamethoxam or fipronil.\nAphids:\nSymptoms: Discolouration of leaves.\nControl: Foliar spray of Imidacloprid when aphid infestation exceeds economic threshold.\nPink Stem Borer:\nSymptoms: Central shoot killed causing 'dead heart'.\nControl: Foliar spray of Quinalphos when pink stem borer is seen.\nEar Cockle:\nSymptoms: Swollen base, dark-brown galls instead of grains.\nControl: Use the floatation technique to separate galls, destroy them, and wash seeds thoroughly before sowing.";
+
+    static String harvesting = "March - April";
+
+    static String postHarvesting = "Drying:\nDry harvested wheat to 12% moisture or lower.\nAvoid direct sun drying to preserve nutrients.\nCleaning:\nRemove chaff, straw, and weed seeds.\nEnsure wheat is clean for storage.\nStorage:\nStore wheat in dry, ventilated areas.\nUse sealed containers or silos to prevent pests.\nGrading:\nSort wheat based on quality.\nSeparate into different grades for market.\nMilling:\nMill wheat to produce flour.\nUse modern equipment for efficiency.\nPackaging:\nPackage flour in clean, labeled bags.\nInclude production and expiry dates.\nTransportation:\nHandle wheat carefully during transport.\nUse appropriate vehicles and packaging.\nQuality Assurance:\nMonitor quality throughout the process.\nInspect and test for safety and standards.";
+}
