@@ -28,9 +28,10 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Carousel Slider with fixed height
             CarouselSlider(
               options: CarouselOptions(
-                height: 335.0,
+                height: 300.0, // Fixed height for the carousel
                 enlargeCenterPage: true,
                 autoPlay: true,
                 aspectRatio: 16 / 9,
@@ -57,14 +58,19 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                             highlightColor: Colors.grey[100]!,
                             child: Container(
                               color: Colors.grey[300],
+                              height: 300.0, // Set height for shimmer
                             ),
                           ),
                           // Actual image
                           Image.network(
                             imageUrl,
-                            fit: BoxFit.fill,
+                            fit: BoxFit.cover, // Use BoxFit.cover to fill the container while preserving aspect ratio
+                            height: 300.0, // Fixed height for the image
+                            width: MediaQuery.of(context).size.width, // Ensure the image takes full width
                             errorBuilder: (context, error, stackTrace) {
-                              return const Icon(Icons.error, size: 50, color: Colors.red);
+                              return const Center(
+                                child: Icon(Icons.error, size: 50, color: Colors.red),
+                              );
                             },
                           ),
                         ],
@@ -128,28 +134,28 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
         ),
       ),
       bottomNavigationBar: BottomAppBar(
-  child: Padding(
-    padding: const EdgeInsets.all(8.0),
-    child: ElevatedButton(
-      child: const Text('Contact for Purchase'),
-      onPressed: () async {
-        const phoneNumber = '+919121725098'; // Replace with your phone number
-        final Uri launchUri = Uri(
-          scheme: 'tel',
-          path: phoneNumber,
-        );
-        try {
-          await launchUrl(launchUri);
-        } catch (e) {
-          // Handle any exceptions (e.g., if the device cannot make calls)
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Could not launch dialer')),
-          );
-        }
-      },
-    ),
-  ),
-),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: ElevatedButton(
+            child: const Text('Contact for Purchase'),
+            onPressed: () async {
+              const phoneNumber = '+919121725098'; // Replace with your phone number
+              final Uri launchUri = Uri(
+                scheme: 'tel',
+                path: phoneNumber,
+              );
+              try {
+                await launchUrl(launchUri);
+              } catch (e) {
+                // Handle any exceptions (e.g., if the device cannot make calls)
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Could not launch dialer')),
+                );
+              }
+            },
+          ),
+        ),
+      ),
     );
   }
 }

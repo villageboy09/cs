@@ -1,19 +1,19 @@
+// ignore_for_file: use_build_context_synchronously
 
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:cropsync/users/sidebar_provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class Sidebar extends StatelessWidget {
-  const Sidebar(
-      {Key? key, required String profileImageUrl, required String userName})
-      : super(key: key);
+  const Sidebar({Key? key, required String profileImageUrl, required String userName}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Drawer(
+      shape: const BeveledRectangleBorder(borderRadius: BorderRadius.all( Radius.circular(0.5))),
       child: Consumer<SidebarProvider>(
         builder: (context, sidebarProvider, child) {
           return ListView(
@@ -57,6 +57,10 @@ class Sidebar extends StatelessWidget {
                   // Handle version info tap
                 },
               ),
+              const SizedBox(height: 20), // Add spacing instead of Spacer
+              const Divider(), // Optional: Separate the logout button from the rest
+              if (!sidebarProvider.isGuestUser)
+                _buildLogoutButton(context), // Show logout button only if logged in
             ],
           );
         },
@@ -64,56 +68,60 @@ class Sidebar extends StatelessWidget {
     );
   }
 
-Widget _buildHeader(SidebarProvider sidebarProvider) {
-  final profileImageUrl = sidebarProvider.profileImageUrl;
-  ImageProvider<Object> imageProvider;
+  Widget _buildHeader(SidebarProvider sidebarProvider) {
+    final profileImageUrl = sidebarProvider.profileImageUrl;
+    ImageProvider<Object> imageProvider;
 
-  if (profileImageUrl.isNotEmpty) {
-    if (profileImageUrl.startsWith('/data/user') || profileImageUrl.startsWith('file://')) {
-      // Handle local file path
-      final file = File(profileImageUrl.startsWith('file://') 
-          ? profileImageUrl.replaceFirst('file://', '') 
-          : profileImageUrl);
-      imageProvider = FileImage(file);
-    } else if (profileImageUrl.startsWith('http://') || profileImageUrl.startsWith('https://')) {
-      // Handle network URL
-      imageProvider = NetworkImage(profileImageUrl);
+    if (profileImageUrl.isNotEmpty) {
+      if (profileImageUrl.startsWith('/data/user') ||
+          profileImageUrl.startsWith('file://')) {
+        final file = File(profileImageUrl.startsWith('file://')
+            ? profileImageUrl.replaceFirst('file://', '')
+            : profileImageUrl);
+        imageProvider = FileImage(file);
+      } else if (profileImageUrl.startsWith('http://') ||
+          profileImageUrl.startsWith('https://')) {
+        imageProvider = NetworkImage(profileImageUrl);
+      } else {
+        imageProvider = const AssetImage('assets/S.png');
+      }
     } else {
-      // Fallback to asset image if the URL is neither a file path nor a network URL
       imageProvider = const AssetImage('assets/S.png');
     }
-  } else {
-    // Default image if no URL
-    imageProvider = const AssetImage('assets/S.png');
+
+    return UserAccountsDrawerHeader(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [Colors.white, Colors.lightBlue],
+        ),
+      ),
+      accountName: Text(
+        sidebarProvider.userName,
+        style: GoogleFonts.poppins(
+          fontWeight: FontWeight.bold,
+          fontSize: 20,
+          color: Colors.brown,
+        ),
+      ),
+      accountEmail: const SizedBox.shrink(), // Optionally display email
+      currentAccountPicture: CircleAvatar(
+        radius: 40,
+        backgroundColor: Colors.white, // Optional: Add a white background
+        backgroundImage: imageProvider,
+        child: profileImageUrl.isEmpty
+            ? const Icon(Icons.person, size: 0.0001, color: Colors.transparent)
+            : null,
+      ),
+    );
   }
 
-  return UserAccountsDrawerHeader(
-    decoration: const BoxDecoration(
-      color: Colors.blueAccent,
-    ),
-    accountName: Text(
-      sidebarProvider.userName,
-      style: GoogleFonts.poppins(
-        fontWeight: FontWeight.bold,
-        fontSize: 20,
-        color: Colors.white,
-      ),
-    ),
-    accountEmail: const Text(''), // Optionally display email
-    currentAccountPicture: CircleAvatar(
-      backgroundImage: imageProvider,
-      child: profileImageUrl.isEmpty
-          ? const Icon(Icons.person, size: 0.000001, color: Colors.transparent)
-          : null,
-    ),
-  );
-}
-
-
-  Widget _buildListTile(
-      {required IconData icon,
-      required String title,
-      required VoidCallback onTap}) {
+  Widget _buildListTile({
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+  }) {
     return ListTile(
       leading: Icon(icon, color: Colors.blueAccent),
       title: Text(
@@ -124,6 +132,42 @@ Widget _buildHeader(SidebarProvider sidebarProvider) {
       tileColor: Colors.transparent,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       hoverColor: Colors.blueAccent.withOpacity(0.1),
+    );
+  }
+
+  Widget _buildLogoutButton(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(10.0),
+      child: ElevatedButton(
+        onPressed: () => _logout(context),
+        style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.redAccent,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(30))),
+        child: Text(
+          'Logout',
+          style: GoogleFonts.poppins(
+              fontWeight: FontWeight.bold, color: Colors.white),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _logout(BuildContext context) async {
+    final sidebarProvider =
+        Provider.of<SidebarProvider>(context, listen: false);
+
+    await FirebaseAuth.instance.signOut();
+    sidebarProvider.logout();
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Logged out successfully')),
+    );
+
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      '/', // Replace with the route name of your home screen
+      (route) => route.settings.name == '/home',
     );
   }
 }

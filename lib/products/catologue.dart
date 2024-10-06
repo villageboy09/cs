@@ -1,6 +1,7 @@
 import 'package:cropsync/products/product_page.dart';
 import 'package:cropsync/users/sidebar.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ProductCatalogPage extends StatelessWidget {
@@ -33,102 +34,119 @@ class ProductCatalogPage extends StatelessWidget {
       ),
     ];
 
-    return Scaffold(
+ return Scaffold(
+      backgroundColor: Colors.green[50],
       appBar: AppBar(
-        title: const Text("Products & Services Catalogue",
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.teal,
-        centerTitle: true,
+              backgroundColor: Colors.green[50],
+        elevation: 0,
+        title: Text('Products & Services',
+            style: GoogleFonts.poppins(fontWeight: FontWeight.w600, color: Colors.black)),
+        actions: [
+              Image.asset(
+                'assets/S.png',
+                width: 48, // Adjust the width as needed
+                height: 48, // Adjust the height as needed
+              ),
+            ],
       ),
       drawer: const Sidebar(profileImageUrl: '', userName: ''),
-      body: GridView.builder(
-        padding: const EdgeInsets.all(16.0),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          childAspectRatio: 0.75,
-          crossAxisSpacing: 16.0,
-          mainAxisSpacing: 16.0,
+      body: Column(
+        children: [
+          Expanded(
+            child: _buildProductGrid(context, products),
+          ),
+        ],
+      ),
+    );
+  }
+
+ 
+
+  Widget _buildProductGrid(BuildContext context, List<Product> products) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final crossAxisCount = screenWidth > 600 ? 3 : 2;
+
+    return GridView.builder(
+      padding: const EdgeInsets.all(16.0),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: crossAxisCount,
+        childAspectRatio: 0.75,
+        crossAxisSpacing: 16.0,
+        mainAxisSpacing: 16.0,
+      ),
+      itemCount: products.length,
+      itemBuilder: (context, index) {
+        final product = products[index];
+        return _buildProductCard(context, product);
+      },
+    );
+  }
+
+  Widget _buildProductCard(BuildContext context, Product product) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ProductDetailsPage(product: product),
+          ),
+        );
+      },
+      child: Card(
+        elevation: 4,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
         ),
-        itemCount: products.length,
-        itemBuilder: (context, index) {
-          final product = products[index];
-          return GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ProductDetailsPage(product: product),
-                ),
-              );
-            },
-            child: Card(
-              elevation: 8,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: ClipRRect(
-                      borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
-                      child: Stack(
-                        children: [
-                          // Shimmer effect while loading image
-                          Shimmer.fromColors(
-                            baseColor: Colors.grey[300]!,
-                            highlightColor: Colors.grey[100]!,
-                            child: Container(
-                              color: Colors.grey[300],
-                            ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              flex: 3,
+              child: ClipRRect(
+                borderRadius: const BorderRadius.all(Radius.circular(16)),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Shimmer.fromColors(
+                      baseColor: Colors.grey[300]!,
+                      highlightColor: Colors.grey[100]!,
+                      child: Container(color: Colors.grey[300]),
+                    ),
+                    Image.network(
+                      product.imageUrls.first,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          color: Colors.grey[300],
+                          child: const Icon(Icons.error),
+                        );
+                      },
+                    ),
+                    Positioned(
+                      top: 8,
+                      right: 8,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.green[600],
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          '₹ ${product.price.toStringAsFixed(2)}',
+                          style: GoogleFonts.poppins(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
                           ),
-                          // Actual image
-                          Image.network(
-                            product.imageUrls.first,
-                            fit: BoxFit.cover,
-                            width: double.infinity,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Container(
-                                color: Colors.grey[300],
-                                child: const Icon(Icons.error),
-                              );
-                            },
-                          ),
-                        ],
+                        ),
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          product.name,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          '₹ ${product.price.toStringAsFixed(2)}',
-                          style: const TextStyle(
-                            color: Colors.green,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          );
-        },
+          ],
+        ),
       ),
     );
   }

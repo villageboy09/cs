@@ -1,4 +1,4 @@
-package com.example.panache14
+package com.cropsync.CropSync
 
 import io.flutter.embedding.android.FlutterActivity
 

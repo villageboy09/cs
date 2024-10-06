@@ -18,6 +18,7 @@ import 'package:cropsync/users/sidebar_provider.dart';
 import 'package:cropsync/users/signup.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -25,6 +26,7 @@ import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+   
   
   // Initialize Firebase
   try {
@@ -34,6 +36,7 @@ void main() async {
   } catch (e) {
     print("Firebase initialization error: $e");
   }
+  await dotenv.load(fileName: ".env");
 
   // Initialize language controller
   LanguageChangeController languageController = LanguageChangeController();

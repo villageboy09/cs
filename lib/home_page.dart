@@ -1,7 +1,5 @@
 // ignore_for_file: library_private_types_in_public_api, avoid_print
-
 import 'dart:ui';
-
 import 'package:cropsync/controller/weather.dart';
 import 'package:cropsync/users/sidebar.dart';
 import 'package:flutter/material.dart';
@@ -18,122 +16,127 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin {
+  final ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
-    Provider.of<WeatherProvider>(context, listen: false).fetchWeather();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<WeatherProvider>(context, listen: false).fetchWeather();
+    });
   }
 
   @override
   void dispose() {
-    // Add any disposal logic for controllers, listeners, etc. here if needed.
+    _scrollController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
+      backgroundColor: Colors.green[50],
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 46, 187, 110), // Deeper green for a more natural feel
-        elevation: 0,
+        backgroundColor: Colors.green[50],
         title: Text(
           'CropSync',
-          style: GoogleFonts.poppins(fontWeight: FontWeight.bold, color: Colors.white),
+          style: GoogleFonts.poppins(fontWeight: FontWeight.w800),
         ),
-        centerTitle: true,
+        actions: [
+          Image.asset(
+            'assets/S.png',
+            width: 48,
+            height: 48,
+          ),
+        ],
       ),
-      drawer: const Sidebar(profileImageUrl: '', userName: '',),
-      body: SafeArea(
-        child: CustomScrollView(
-          slivers: [
-            SliverToBoxAdapter(child: _buildCurrentWeatherWidget(context)),
-            SliverToBoxAdapter(child: _buildServicesSection(context)),
-            SliverToBoxAdapter(child: _buildStatsSection(context)),
-            SliverToBoxAdapter(child: _buildAboutUsSection(context)),
-          ],
-        ),
+      drawer: const Sidebar(profileImageUrl: '', userName: ''),
+      body: CustomScrollView(
+        controller: _scrollController,
+        physics: const ClampingScrollPhysics(),
+        slivers: [
+          SliverToBoxAdapter(child: _buildCurrentWeatherWidget(context)),
+          SliverToBoxAdapter(child: _buildServicesSection(context)),
+          SliverToBoxAdapter(child: _buildStatsSection(context)),
+          SliverToBoxAdapter(child: _buildAboutUsSection(context)),
+        ],
       ),
     );
   }
 
-Widget _buildCurrentWeatherWidget(BuildContext context) {
-  return Consumer<WeatherProvider>(
-    builder: (context, weatherProvider, child) {
-      if (weatherProvider.currentWeather.isEmpty) {
-        return _buildShimmerWeather();
-      }
+  @override
+  bool get wantKeepAlive => true;
 
-      final currentWeather = weatherProvider.currentWeather;
-      final locationName = weatherProvider.locationName;
-      final temperature = currentWeather['temp'];
-      final conditions = currentWeather['conditions'];
-      final weatherIcon = _getWeatherIcon(conditions);
+  Widget _buildCurrentWeatherWidget(BuildContext context) {
+    return Consumer<WeatherProvider>(
+      builder: (context, weatherProvider, child) {
+        if (weatherProvider.currentWeather.isEmpty) {
+          return _buildShimmerWeather();
+        }
+        final currentWeather = weatherProvider.currentWeather;
+        final locationName = weatherProvider.locationName;
+        final temperature = currentWeather['temp'];
+        final conditions = currentWeather['conditions'];
+        final weatherIcon = _getWeatherIcon(conditions);
 
-      // Safely get wind speed and visibility with fallback values
-      final windSpeed = currentWeather['windspeed']?.toString() ?? 'N/A';
-      final visibility = currentWeather['visibility']?.toString() ?? 'N/A';
-
-      return GestureDetector(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const WeatherPage()),
-          );
-        },
-        child: Container(
-          margin: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Colors.blue[400]!, Colors.blue[800]!],
-            ),
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.2),
-                blurRadius: 10,
-                offset: const Offset(0, 5),
+        return GestureDetector(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const WeatherPage()),
+            );
+          },
+          child: Container(
+            margin: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Colors.blue[400]!, Colors.blue[800]!],
               ),
-            ],
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(20),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.2),
+                  blurRadius: 10,
+                  offset: const Offset(0, 5),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(20),
               child: Container(
                 padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(20),
-                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              locationName,
-                              style: GoogleFonts.poppins(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                locationName,
+                                style: GoogleFonts.poppins(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              conditions,
-                              style: GoogleFonts.poppins(
-                                fontSize: 16,
-                                color: Colors.white.withOpacity(0.8),
+                              const SizedBox(height: 4),
+                              Text(
+                                conditions,
+                                style: GoogleFonts.poppins(
+                                  fontSize: 16,
+                                  color: Colors.white.withOpacity(0.8),
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                         Icon(
                           weatherIcon,
@@ -151,70 +154,31 @@ Widget _buildCurrentWeatherWidget(BuildContext context) {
                         color: Colors.white,
                       ),
                     ),
-                    const SizedBox(height: 20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        _buildWeatherDetail(Icons.water_drop, '${currentWeather['humidity'] ?? 'N/A'}%', 'Humidity'),
-                        _buildWeatherDetail(Icons.air, '$windSpeed km/h', 'Wind'),
-                        _buildWeatherDetail(Icons.visibility, '$visibility km', 'Visibility'),
-                      ],
-                    ),
                   ],
                 ),
               ),
             ),
           ),
-        ),
-      );
-    },
-  );
-}
-
-Widget _buildWeatherDetail(IconData icon, String value, String label) {
-  return Column(
-    children: [
-      Icon(icon, color: Colors.white, size: 24),
-      const SizedBox(height: 4),
-      Text(
-        value,
-        style: GoogleFonts.poppins(
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-          color: Colors.white,
-        ),
-      ),
-      Text(
-        label,
-        style: GoogleFonts.poppins(
-          fontSize: 12,
-          color: Colors.white.withOpacity(0.8),
-        ),
-      ),
-    ],
-  );
-}
+        );
+      },
+    );
+  }
 
   IconData _getWeatherIcon(String? condition) {
-    print('Condition: $condition'); // Debugging line
-
     if (condition == null || condition.isEmpty) {
       return FontAwesomeIcons.circleQuestion;
     }
-
-    List<String> conditions = condition.toLowerCase().split(',').map((e) => e.trim()).toList();
-
-    final Map<String, IconData> conditionIcons = {
+    List conditions = condition.toLowerCase().split(',').map((e) => e.trim()).toList();
+    final Map conditionIcons = {
       'rain': FontAwesomeIcons.cloudRain,
       'partly cloudy': FontAwesomeIcons.cloudSun,
       'sunny': FontAwesomeIcons.sun,
       'cloudy': FontAwesomeIcons.cloud,
       'snow': FontAwesomeIcons.snowflake,
       'thunderstorm': FontAwesomeIcons.bolt,
-      'overcast': FontAwesomeIcons.cloud
+      'overcast': FontAwesomeIcons.cloud,
     };
-
-    final Map<String, String> conditionKeywords = {
+    final Map conditionKeywords = {
       'partially cloudy': 'partly cloudy',
       'overcast': 'overcast',
     };
@@ -223,14 +187,12 @@ Widget _buildWeatherDetail(IconData icon, String value, String label) {
       for (String keyword in conditionKeywords.keys) {
         if (cond.contains(keyword)) {
           cond = conditionKeywords[keyword]!;
+          if (conditionIcons.containsKey(cond)) {
+            return conditionIcons[cond]!;
+          }
         }
       }
-
-      if (conditionIcons.containsKey(cond)) {
-        return conditionIcons[cond]!;
-      }
     }
-
     return FontAwesomeIcons.circleQuestion;
   }
 
@@ -247,16 +209,32 @@ Widget _buildWeatherDetail(IconData icon, String value, String label) {
     );
   }
 
- Widget _buildServicesSection(BuildContext context) {
+Widget _buildServicesSection(BuildContext context) {
   final services = [
-    {'icon': Icons.landscape, 'name': 'Soil Analysis', 'description': 'Optimize your soil health'},
-    {'icon': Icons.eco, 'name': 'Crop Advisory', 'description': 'Expert guidance for better yields'},
-    {'icon': Icons.pest_control, 'name': 'Pest Detection', 'description': 'Keep your crops safe'},
-    {'icon': Icons.cloud, 'name': 'Weather Forecast', 'description': 'Stay updated with accuracy'},
+    {
+      'icon': Icons.landscape,
+      'name': 'Soil Analysis',
+      'description': 'Optimize your soil health'
+    },
+    {
+      'icon': Icons.eco,
+      'name': 'Crop Advisory',
+      'description': 'Expert guidance for better yields'
+    },
+    {
+      'icon': Icons.pest_control,
+      'name': 'Pest Detection',
+      'description': 'Keep your crops safe'
+    },
+    {
+      'icon': Icons.cloud,
+      'name': 'Weather Forecast',
+      'description': 'Stay updated'
+    },
   ];
 
   return Container(
-    padding: const EdgeInsets.all(24),
+    padding: const EdgeInsets.all(16),
     decoration: BoxDecoration(
       gradient: LinearGradient(
         begin: Alignment.topLeft,
@@ -283,20 +261,43 @@ Widget _buildWeatherDetail(IconData icon, String value, String label) {
             color: Colors.green[600],
           ),
         ),
-        const SizedBox(height: 24),
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: MediaQuery.of(context).size.width > 600 ? 4 : 2,
-            childAspectRatio: 0.75,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
-          ),
-          itemCount: services.length,
-          itemBuilder: (context, index) {
-            final service = services[index];
-            return _buildServiceCard(service);
+        const SizedBox(height: 16),
+
+        // Remove the Expanded widget
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final screenWidth = constraints.maxWidth;
+            final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+
+            double childAspectRatio;
+            double fontSize;
+
+            if (screenWidth > 900) {
+              childAspectRatio = 1.2;
+              fontSize = 16;
+            } else if (screenWidth > 600) {
+              childAspectRatio = isLandscape ? 1.5 : 1.1;
+              fontSize = 15;
+            } else {
+              childAspectRatio = isLandscape ? 1.8 : 0.9;
+              fontSize = 14;
+            }
+
+            return GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(), // Keep this as is if you want to disable scrolling
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: childAspectRatio,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+              ),
+              itemCount: services.length,
+              itemBuilder: (BuildContext context, int index) {
+                final service = services[index];
+                return _buildServiceCard(service, fontSize);
+              },
+            );
           },
         ),
       ],
@@ -304,72 +305,53 @@ Widget _buildWeatherDetail(IconData icon, String value, String label) {
   );
 }
 
-Widget _buildServiceCard(Map<String, dynamic> service) {
-  return Container(
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(20),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.green.withOpacity(0.1),
-          blurRadius: 10,
-          offset: const Offset(0, 4),
-        ),
-      ],
-    ),
-    child: ClipRRect(
-      borderRadius: BorderRadius.circular(20),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.8),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.green.withOpacity(0.1)),
+Widget _buildServiceCard(Map service, double fontSize) {
+  return Card(
+    elevation: 4,
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+    child: Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.green[50],
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              service['icon'] as IconData,
+              size: 32,
+              color: Colors.green[700],
+            ),
           ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.green[50],
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  service['icon'] as IconData,
-                  size: 36,
-                  color: Colors.green[700],
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                service['name'] as String,
-                style: GoogleFonts.poppins(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.green[800],
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                service['description'] as String,
-                style: GoogleFonts.poppins(
-                  fontSize: 14,
-                  color: Colors.green[600],
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ],
+          const SizedBox(height: 8),
+          Text(
+            service['name'] as String,
+            style: GoogleFonts.poppins(
+              fontSize: fontSize,
+              fontWeight: FontWeight.bold,
+              color: Colors.green[800],
+            ),
+            textAlign: TextAlign.center,
           ),
-        ),
+          const SizedBox(height: 4),
+          Text(
+            service['description'] as String,
+            style: GoogleFonts.poppins(
+              fontSize: fontSize - 2,
+              color: Colors.green[600],
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     ),
   );
 }
 
-Widget _buildStatsSection(BuildContext context) {
+ Widget _buildStatsSection(BuildContext context) {
   final stats = [
     {'name': 'Farmers Reached', 'value': 2500},
     {'name': 'Crops Analyzed', 'value': 50},
@@ -383,7 +365,7 @@ Widget _buildStatsSection(BuildContext context) {
       gradient: LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
-        colors: [Colors.green[700]!, Colors.green[900]!],
+        colors: [Colors.green[500]!, Colors.green[900]!],
       ),
     ),
     child: Column(
@@ -406,27 +388,37 @@ Widget _buildStatsSection(BuildContext context) {
           ),
         ),
         const SizedBox(height: 30),
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: MediaQuery.of(context).size.width > 600 ? 4 : 2,
-            childAspectRatio: 1.2,
-            crossAxisSpacing: 20,
-            mainAxisSpacing: 20,
-          ),
-          itemCount: stats.length,
-          itemBuilder: (context, index) {
-            final stat = stats[index];
-            return _buildStatCard(stat);
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final screenWidth = constraints.maxWidth;
+            final crossAxisCount = screenWidth > 900
+                ? 4
+                : screenWidth > 600
+                    ? 3
+                    : 2;
+
+            return GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: crossAxisCount,
+                childAspectRatio: 1.2,
+                crossAxisSpacing: 20,
+                mainAxisSpacing: 20,
+              ),
+              itemCount: stats.length,
+              itemBuilder: (context, index) {
+                final stat = stats[index];
+                return _buildStatCard(stat);
+              },
+            );
           },
         ),
       ],
     ),
   );
 }
-
-Widget _buildStatCard(Map<String, dynamic> stat) {
+Widget _buildStatCard(Map stat) {
   return Container(
     decoration: BoxDecoration(
       color: Colors.white.withOpacity(0.1),
@@ -438,26 +430,31 @@ Widget _buildStatCard(Map<String, dynamic> stat) {
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(10), // Reduced padding
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
-                '${stat['value']}', // Display the value directly
-                style: GoogleFonts.poppins(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+              FittedBox( // Wrap text in FittedBox
+                child: Text(
+                  '${stat['value']}',
+                  style: GoogleFonts.poppins(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
               ),
-              const SizedBox(height: 8),
-              Text(
-                stat['name'] as String,
-                style: GoogleFonts.poppins(
-                  fontSize: 14,
-                  color: Colors.white.withOpacity(0.8),
+              const SizedBox(height: 4), // Reduced spacing
+              FittedBox( // Wrap text in FittedBox
+                child: Text(
+                  stat['name'] as String,
+                  style: GoogleFonts.poppins(
+                    fontSize: 14,
+                    color: Colors.white.withOpacity(0.8),
+                  ),
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis, // Handle overflow
                 ),
-                textAlign: TextAlign.center,
               ),
             ],
           ),
@@ -466,10 +463,11 @@ Widget _buildStatCard(Map<String, dynamic> stat) {
     ),
   );
 }
+
   Widget _buildAboutUsSection(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
-      color: const Color(0xFFF9FBE7), // Very light yellow-green for about section
+      color: const Color(0xFFF9FBE7),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

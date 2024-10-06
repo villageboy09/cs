@@ -33,7 +33,7 @@ class _SoyabeanDetailPageState extends State<SoyabeanDetailPage> {
         'description': AppLocalizations.of(context)?.soyabean_soil_type_key ??
             'Default Description',
         'imageUrls': [
-          'https://drive.google.com/uc?export=view&id=19uzK7SJQ_LhL8gL032DdOGKaQhSzVWmV',
+          'https://drive.google.com/uc?export=view&id=1SGWUDSzRA0-A3Rg2ZuLnQ4n2N8A5TXys',
           'https://drive.google.com/uc?export=view&id=1PbGI9NTz_eVtHBqgxdNdppvZ7IjvPUhS'
         ],
       },
@@ -43,7 +43,7 @@ class _SoyabeanDetailPageState extends State<SoyabeanDetailPage> {
         'description': AppLocalizations.of(context)?.soyabean_seed_rate_key ??
             'Default Description',
         'imageUrls': [
-          'https://drive.google.com/uc?export=view&id=1emhFc_5q-UMlST8s5Mb9W91rZxrNr927',
+          'https://drive.google.com/uc?export=view&id=1SGWUDSzRA0-A3Rg2ZuLnQ4n2N8A5TXys',
           'https://drive.google.com/uc?export=view&id=1emhFc_5q-UMlST8s5Mb9W91rZxrNr927',
         ],
       },
@@ -54,7 +54,7 @@ class _SoyabeanDetailPageState extends State<SoyabeanDetailPage> {
             AppLocalizations.of(context)?.soyabean_seed_treatment_key ??
                 'Default Description',
         'imageUrls': [
-          'https://drive.google.com/uc?export=view&id=19uzK7SJQ_LhL8gL032DdOGKaQhSzVWmV',
+          'https://drive.google.com/uc?export=view&id=1SGWUDSzRA0-A3Rg2ZuLnQ4n2N8A5TXys',
           'https://drive.google.com/uc?export=view&id=1PbGI9NTz_eVtHBqgxdNdppvZ7IjvPUhS'
         ],
       },
@@ -65,7 +65,7 @@ class _SoyabeanDetailPageState extends State<SoyabeanDetailPage> {
             AppLocalizations.of(context)?.soyabean_growing_season_key ??
                 'Default Description',
         'imageUrls': [
-          'https://drive.google.com/uc?export=view&id=1emhFc_5q-UMlST8s5Mb9W91rZxrNr927',
+          'https://drive.google.com/uc?export=view&id=1SGWUDSzRA0-A3Rg2ZuLnQ4n2N8A5TXys',
           'https://drive.google.com/uc?export=view&id=1emhFc_5q-UMlST8s5Mb9W91rZxrNr927',
         ],
       },
@@ -74,7 +74,7 @@ class _SoyabeanDetailPageState extends State<SoyabeanDetailPage> {
         'description': AppLocalizations.of(context)?.soyabean_crop_duration_key ??
             'Default Description',
         'imageUrls': [
-          'https://drive.google.com/uc?export=view&id=19uzK7SJQ_LhL8gL032DdOGKaQhSzVWmV',
+          'https://drive.google.com/uc?export=view&id=1SGWUDSzRA0-A3Rg2ZuLnQ4n2N8A5TXys',
           'https://drive.google.com/uc?export=view&id=1PbGI9NTz_eVtHBqgxdNdppvZ7IjvPUhS'
         ],
       },
@@ -85,7 +85,7 @@ class _SoyabeanDetailPageState extends State<SoyabeanDetailPage> {
             AppLocalizations.of(context)?.soyabean_irrigation_schedule_key ??
                 'Default Description',
         'imageUrls': [
-          'https://drive.google.com/uc?export=view&id=1emhFc_5q-UMlST8s5Mb9W91rZxrNr927',
+          'https://drive.google.com/uc?export=view&id=1SGWUDSzRA0-A3Rg2ZuLnQ4n2N8A5TXys',
           'https://drive.google.com/uc?export=view&id=1emhFc_5q-UMlST8s5Mb9W91rZxrNr927',
         ],
       },
@@ -96,7 +96,7 @@ class _SoyabeanDetailPageState extends State<SoyabeanDetailPage> {
             AppLocalizations.of(context)?.soyabean_nutrient_requirement_key ??
                 'Default Description',
         'imageUrls': [
-          'https://drive.google.com/uc?export=view&id=19uzK7SJQ_LhL8gL032DdOGKaQhSzVWmV',
+          'https://drive.google.com/uc?export=view&id=1SGWUDSzRA0-A3Rg2ZuLnQ4n2N8A5TXys',
           'https://drive.google.com/uc?export=view&id=1PbGI9NTz_eVtHBqgxdNdppvZ7IjvPUhS'
         ],
       },
@@ -107,7 +107,7 @@ class _SoyabeanDetailPageState extends State<SoyabeanDetailPage> {
             AppLocalizations.of(context)?.soyabean_weed_management_key ??
                 'Default Description',
         'imageUrls': [
-          'https://drive.google.com/uc?export=view&id=1emhFc_5q-UMlST8s5Mb9W91rZxrNr927',
+          'https://drive.google.com/uc?export=view&id=1SGWUDSzRA0-A3Rg2ZuLnQ4n2N8A5TXys',
           'https://drive.google.com/uc?export=view&id=1emhFc_5q-UMlST8s5Mb9W91rZxrNr927',
         ],
       },
@@ -118,7 +118,7 @@ class _SoyabeanDetailPageState extends State<SoyabeanDetailPage> {
                 ?.soyabean_disease_and_pest_management_key ??
             'Default Description',
         'imageUrls': [
-          'https://drive.google.com/uc?export=view&id=19uzK7SJQ_LhL8gL032DdOGKaQhSzVWmV',
+          'https://drive.google.com/uc?export=view&id=1SGWUDSzRA0-A3Rg2ZuLnQ4n2N8A5TXys',
           'https://drive.google.com/uc?export=view&id=1PbGI9NTz_eVtHBqgxdNdppvZ7IjvPUhS'
         ],
       },
@@ -127,7 +127,7 @@ class _SoyabeanDetailPageState extends State<SoyabeanDetailPage> {
         'description': AppLocalizations.of(context)?.soyabean_harvesting_key ??
             'Default Description',
         'imageUrls': [
-          'https://drive.google.com/uc?export=view&id=1emhFc_5q-UMlST8s5Mb9W91rZxrNr927',
+          'https://drive.google.com/uc?export=view&id=1SGWUDSzRA0-A3Rg2ZuLnQ4n2N8A5TXys',
           'https://drive.google.com/uc?export=view&id=1emhFc_5q-UMlST8s5Mb9W91rZxrNr927',
         ],
       },
@@ -138,7 +138,7 @@ class _SoyabeanDetailPageState extends State<SoyabeanDetailPage> {
             AppLocalizations.of(context)?.soyabean_post_harvesting_key ??
                 'Default Description',
         'imageUrls': [
-          'https://drive.google.com/uc?export=view&id=19uzK7SJQ_LhL8gL032DdOGKaQhSzVWmV',
+          'https://drive.google.com/uc?export=view&id=1SGWUDSzRA0-A3Rg2ZuLnQ4n2N8A5TXys',
           'https://drive.google.com/uc?export=view&id=1PbGI9NTz_eVtHBqgxdNdppvZ7IjvPUhS'
         ],
       },

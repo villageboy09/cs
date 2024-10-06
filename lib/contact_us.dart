@@ -3,7 +3,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:gsheets/gsheets.dart';
 import 'package:mailto/mailto.dart';
 import 'package:url_launcher/url_launcher_string.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 
 class ContactUsPage extends StatefulWidget {
@@ -22,14 +21,18 @@ class _ContactUsPageState extends State<ContactUsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+           backgroundColor: Colors.green[50],
       appBar: AppBar(
-        backgroundColor: Colors.teal,
-        elevation: 0,
-        title: Text(
-          'CropSync',
-          style: GoogleFonts.poppins(fontWeight: FontWeight.bold, color: Colors.white),
-        ),
-        centerTitle: true,
+        backgroundColor: Colors.green[50],
+        title: Text('Contact Us',
+            style: GoogleFonts.poppins(fontWeight: FontWeight.w800)),
+        actions: [
+          Image.asset(
+            'assets/S.png',
+            width: 48, // Adjust the width as needed
+            height: 48, // Adjust the height as needed
+          ),
+        ],
       ),
 
       body: ListView(
@@ -40,26 +43,26 @@ class _ContactUsPageState extends State<ContactUsPage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const SizedBox(height: 16),
-                Text(AppLocalizations.of(context)?.addressTitle??'Address:',
+                Text('Address:',
                     style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 4),
                 Text(
-                  AppLocalizations.of(context)?.address ??'Vivekananda Global University, Jaipur, Rajasthan - 303012',
+                  'SY NO. 241/A, DP VALLEY, VILLAGE, GANDIMAISAMMA, Bowrampet, Rangareddy, K.V.Rangareddy-500043, Telangana',
                   style: GoogleFonts.poppins(),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 8),
-                Text(AppLocalizations.of(context)?.phoneTitle ??'Phone:',
+                Text('Phone:',
                     style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 4),
-                Text(AppLocalizations.of(context)?.phoneNumber ??'9182867605', style: GoogleFonts.poppins()),
+                Text('9182867605', style: GoogleFonts.poppins()),
                 const SizedBox(height: 8),
-                Text(AppLocalizations.of(context)?.emailTitle ??'Email:',
+                Text('Email:',
                     style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 4),
-                Text(AppLocalizations.of(context)?.emailAddress ??'agrico247@gmail.com', style: GoogleFonts.poppins()),
+                Text('careers.cropsync@gmail.com', style: GoogleFonts.poppins()),
                 const SizedBox(height: 16),
-                Text(AppLocalizations.of(context)?.followUsTitle ??"Follow us on:",
+                Text("Follow us on:",
                     style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 4),
                 Row(
@@ -71,7 +74,7 @@ class _ContactUsPageState extends State<ContactUsPage> {
                         imageUrl: 'assets/mail.png',
                         url: 'mailto:agrico247@gmail.com',
                         onTap: () {
-                          launchMail('agrico247@gmail.com');
+                          launchMail('careers.cropsync@gmail.com');
                         },
                       ),
                     ),
@@ -100,7 +103,7 @@ class _ContactUsPageState extends State<ContactUsPage> {
                   ],
                 ),
                 const SizedBox(height: 16),
-                Text(AppLocalizations.of(context)?.shareFeedbackTitle ??"Share your feedback :",
+                Text("Share your feedback :",
                     style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
                 const SizedBox(height: 4),
                 Padding(
@@ -111,7 +114,7 @@ class _ContactUsPageState extends State<ContactUsPage> {
                       children: [
                         TextFormField(
                           decoration: InputDecoration(
-                            hintText: AppLocalizations.of(context)?.nameLabel ??'Name',
+                            hintText:'Name',
                             border: const OutlineInputBorder(),
                             enabledBorder: const OutlineInputBorder(
                               borderSide: BorderSide(color: Colors.grey),
@@ -135,7 +138,7 @@ class _ContactUsPageState extends State<ContactUsPage> {
                           decoration: InputDecoration(
                             floatingLabelAlignment:
                                 FloatingLabelAlignment.start,
-                            hintText:AppLocalizations.of(context)?.emailLabel ?? 'Email',
+                            hintText:'Email',
                             border: const OutlineInputBorder(),
                             enabledBorder: const OutlineInputBorder(
                               borderSide: BorderSide(color: Colors.grey),
@@ -147,7 +150,7 @@ class _ContactUsPageState extends State<ContactUsPage> {
                           ),
                           validator: (value) {
                             if (value!.isEmpty || !value.contains('@')) {
-                              return AppLocalizations.of(context)?.emailError ??'Please enter a valid email';
+                              return 'Please enter a valid email';
                             }
                             return null;
                           },
@@ -157,7 +160,7 @@ class _ContactUsPageState extends State<ContactUsPage> {
                         const SizedBox(height: 16),
                         TextFormField(
                           decoration: InputDecoration(
-                            hintText: AppLocalizations.of(context)?.messageLabel ??'Message',
+                            hintText: 'Message',
                             border: const OutlineInputBorder(),
                             enabledBorder: const OutlineInputBorder(
                               borderSide: BorderSide(color: Colors.grey),
@@ -169,7 +172,7 @@ class _ContactUsPageState extends State<ContactUsPage> {
                           ),
                           validator: (value) {
                             if (value!.isEmpty) {
-                              return AppLocalizations.of(context)?.messageError ??'Please enter a message';
+                              return 'Please enter a message';
                             }
                             return null;
                           },
@@ -181,7 +184,7 @@ class _ContactUsPageState extends State<ContactUsPage> {
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
-                            child: Text(AppLocalizations.of(context)?.sendButtonLabel ??'Send Message',
+                            child: Text('Send Message',
                                 style: GoogleFonts.poppins()),
                             onPressed: () async {
                               if (_formKey.currentState!.validate()) {
@@ -196,7 +199,7 @@ class _ContactUsPageState extends State<ContactUsPage> {
                                         .shade600, // Custom background color
                                     content: Text(
                                       // ignore: use_build_context_synchronously
-                                      AppLocalizations.of(context)?.messageSentSnackBar ??'Message sent',
+                                      'Message sent',
                                       style: GoogleFonts.poppins(
                                         fontWeight: FontWeight.bold,
                                         color:

@@ -108,42 +108,22 @@ class _DashboardPageState extends State<DashboardPage> {
     });
   }
 
-  Future<void> _logout() async {
-    final sidebarProvider =
-        Provider.of<SidebarProvider>(context, listen: false);
-
-    await FirebaseAuth.instance.signOut();
-    sidebarProvider.logout(); // Inform the SidebarProvider of the logout action
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Logged out successfully')),
-    );
-
-    Navigator.pushNamedAndRemoveUntil(
-      context,
-      '/', // Replace with the route name of your home screen
-      (route) =>
-          route.settings.name ==
-          '/home', // Replace with the route name of your home screen
-    );
-  }
-
-  @override
+ 
+   @override
   Widget build(BuildContext context) {
     return Scaffold(
+            backgroundColor: Colors.green[50],
       appBar: AppBar(
-        title: const Text('Dashboard'),
+        title: Text('Dashboard', style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
+      backgroundColor: Colors.green[50],
+        elevation: 0,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      body: SingleChildScrollView(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _buildProfileSection(),
-            const SizedBox(height: 32.0),
+            const SizedBox(height: 24),
             _buildEnrolledCoursesSection(),
-            const Spacer(),
-            _buildLogoutButton(),
           ],
         ),
       ),
@@ -154,146 +134,183 @@ class _DashboardPageState extends State<DashboardPage> {
     final user = FirebaseAuth.instance.currentUser;
 
     return StreamBuilder<DocumentSnapshot>(
-      stream: FirebaseFirestore.instance
-          .collection('users')
-          .doc(user?.uid)
-          .snapshots(),
+      stream: FirebaseFirestore.instance.collection('users').doc(user?.uid).snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
+          return const Center(child: CircularProgressIndicator());
         }
 
         if (snapshot.hasError) {
-          return const Text('Error loading profile');
+          return Center(child: Text('Error loading profile', style: GoogleFonts.poppins(color: Colors.red)));
         }
 
         final userData = snapshot.data?.data() as Map<String, dynamic>?;
         final profileImageUrl = userData?['profileImageUrl'];
         final userName = userData?['name'] ?? '';
 
-        // Pre-fill the name controller with the existing name
         _nameController.text = userName;
 
-        return Column(
-          children: [
-            Stack(
-              children: [
-                CircleAvatar(
-                  radius: 50,
-                  backgroundImage: _isEditing
-                      ? (_image != null
-                          ? FileImage(File(_image!.path))
-                          : (profileImageUrl != null
-                              ? FileImage(File(profileImageUrl))
-                              : null))
-                      : (profileImageUrl != null
-                          ? FileImage(File(profileImageUrl))
-                          : null),
-                  child: (profileImageUrl == null && _image == null)
-                      ? const Icon(Icons.person, size: 50)
-                      : null,
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(
+            children: [
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  CircleAvatar(
+                    radius: 60,
+                    backgroundImage: _getProfileImage(profileImageUrl),
+                    child: (profileImageUrl == null && _image == null)
+                        ? const Icon(Icons.person, size: 0.0001, color: Colors.transparent)
+                        : null,
+                  ),
+                  if (_isEditing)
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: CircleAvatar(
+                        backgroundColor: Colors.white,
+                        child: IconButton(
+                          icon: const Icon(Icons.camera_alt, color: Colors.green),
+                          onPressed: _pickImage,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              _isEditing
+                  ? TextField(
+                      controller: _nameController,
+                      decoration: InputDecoration(
+                        labelText: 'Name',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        filled: true,
+                        fillColor: Colors.white,
+                      ),
+                    )
+                  : Text(
+                      userName,
+                      style: GoogleFonts.poppins(fontSize: 24, fontWeight: FontWeight.bold),
+                    ),
+              const SizedBox(height: 16),
+              ElevatedButton.icon(
+                onPressed: () {
+                  if (_isEditing) {
+                    _updateProfile();
+                  }
+                  setState(() {
+                    _isEditing = !_isEditing;
+                  });
+                },
+                icon: Icon(_isEditing ? Icons.save : Icons.edit,color: Colors.black,),
+                label: Text(_isEditing ? 'Save Profile' : 'Edit Profile',style: GoogleFonts.poppins(fontSize: 16,color: Colors.black),),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.lightGreenAccent,
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
                 ),
-                if (_isEditing)
-                  Positioned(
-                    bottom: 0,
-                    right: 0,
-                    child: IconButton(
-                      icon: const Icon(Icons.edit),
-                      onPressed: _pickImage,
-                    ),
-                  ),
-              ],
-            ),
-            const SizedBox(height: 16.0),
-            _isEditing
-                ? TextField(
-                    controller: _nameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Name',
-                      border: OutlineInputBorder(),
-                    ),
-                  )
-                : Text(
-                    userName,
-                    style: GoogleFonts.poppins(
-                        fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-            const SizedBox(height: 16.0),
-            ElevatedButton(
-              onPressed: () {
-                if (_isEditing) {
-                  _updateProfile(); // Save changes
-                }
-                setState(() {
-                  _isEditing = !_isEditing; // Toggle between edit and view mode
-                });
-              },
-              child: Text(_isEditing ? 'Update Profile' : 'Edit Profile'),
-            ),
-          ],
+              ),
+            ],
+          ),
         );
       },
     );
+  }
+
+  ImageProvider? _getProfileImage(String? profileImageUrl) {
+    if (_isEditing && _image != null) {
+      return FileImage(File(_image!.path));
+    } else if (profileImageUrl != null) {
+      return FileImage(File(profileImageUrl));
+    }
+    return null;
   }
 
   Widget _buildEnrolledCoursesSection() {
     final user = FirebaseAuth.instance.currentUser;
 
     return StreamBuilder(
-      stream: FirebaseFirestore.instance
-          .collection('users')
-          .doc(user?.uid)
-          .snapshots(),
+      stream: FirebaseFirestore.instance.collection('users').doc(user?.uid).snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
+          return const Center(child: CircularProgressIndicator());
         }
 
         if (snapshot.hasError) {
-          return const Text('Error loading courses');
+          return Center(child: Text('Error loading courses', style: GoogleFonts.poppins(color: Colors.red)));
         }
 
         final userData = snapshot.data?.data() as Map?;
         final enrolledCourses = List.from(userData?['enrolledCourses'] ?? []);
 
-        if (enrolledCourses.isNotEmpty) {
-          return Column(
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.green.shade50,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Text('Enrolled Courses:'),
-              const SizedBox(height: 8.0),
-              ...enrolledCourses.map((course) {
-                return ElevatedButton(
-                  onPressed: () {
-                    if (course == 'Crop Consultant/Agronomist') {
-                      Navigator.pushReplacementNamed(context,
-                          '/agronomistCourse'); // Update with actual route
-                    } else if (course ==
-                        'Supply Chain Manager in Agriculture') {
-                      Navigator.pushReplacementNamed(context,
-                          '/supplyChainCourse'); // Update with actual route
-                    }
+              Center(
+                child: Text(
+                  'Enrolled Courses',
+                  style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+              ),
+              const SizedBox(height: 16),
+              if (enrolledCourses.isNotEmpty)
+                ListView.separated(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: enrolledCourses.length,
+                  separatorBuilder: (context, index) => const SizedBox(height: 12),
+                  itemBuilder: (context, index) {
+                    return _buildCourseCard(enrolledCourses[index]);
                   },
-                  child: Text(course),
-                );
-              }).toList(),
+                )
+              else
+                Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Text(
+                      'No courses enrolled yet.',
+                      style: GoogleFonts.poppins(fontSize: 16),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
             ],
-          );
-        } else {
-          return const Text('No courses enrolled yet.');
-        }
+          ),
+        );
       },
     );
   }
 
-  Widget _buildLogoutButton() {
-    return ElevatedButton(
-      onPressed: _logout,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.red, // Set the color of the logout button
+  Widget _buildCourseCard(String course) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        title: Text(course, style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
+        trailing: const Icon(Icons.arrow_forward_ios, color: Colors.green),
+        onTap: () {
+          if (course == 'Crop Consultant/Agronomist') {
+            Navigator.pushReplacementNamed(context, '/agronomistCourse');
+          } else if (course == 'Supply Chain Manager in Agriculture') {
+            Navigator.pushReplacementNamed(context, '/supplyChainCourse');
+          }
+        },
       ),
-      child: Text('Logout',
-          style: GoogleFonts.poppins(), selectionColor: Colors.black),
     );
   }
 }

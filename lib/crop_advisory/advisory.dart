@@ -26,12 +26,18 @@ class CropAdvisoryPage extends StatelessWidget {
       builder: (context, languageController, child) {
         final appLocalizations = AppLocalizations.of(context)!;
         return Scaffold(
+          backgroundColor: Colors.green[50],
           appBar: AppBar(
+            backgroundColor: Colors.green[50],
             title: Text(appLocalizations.cropAdvisory,
-                style: const TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.bold)),
-            backgroundColor: Colors.teal,
-            centerTitle: true,
+                style: GoogleFonts.poppins(fontWeight: FontWeight.w800)),
+            actions: [
+              Image.asset(
+                'assets/S.png',
+                width: 48, // Adjust the width as needed
+                height: 48, // Adjust the height as needed
+              ),
+            ],
           ),
           drawer: const Sidebar(profileImageUrl: '', userName: ''),
           body: _buildBody(context, appLocalizations),
@@ -170,7 +176,7 @@ class CropData {
           label: appLocalizations.bajra),
       CropData(
           imageUrl:
-              'https://drive.google.com/uc?export=view&id=1gVNkpNGpLS5v1rxtuZQU1VJ9lCwnOG4q',
+              'https://drive.google.com/uc?export=view&id=1NXWK5Z07eGF8vSSZ2giOhpXq55q1JrRH',
           label: appLocalizations.maize),
       CropData(
           imageUrl:

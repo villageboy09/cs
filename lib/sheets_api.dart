@@ -1,6 +1,9 @@
 // ignore_for_file: library_private_types_in_public_api, non_constant_identifier_names, use_build_context_synchronously
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 import 'package:gsheets/gsheets.dart';
@@ -11,26 +14,9 @@ class SheetPage extends StatefulWidget {
   @override
   _SheetPageState createState() => _SheetPageState();
 }
-
-class _SheetPageState extends State<SheetPage> {
-  final sheetId = "19PeaN7G1V2QN-avxrEeyf9Ofj5dzwwTalQWaCQn1ymw";
-
-  final credentials = {
-    "type": "service_account",
-    "project_id": "cropsync-419318",
-    "private_key_id": "a9618acecdf28c648ece9c7e07f546ea49274ca6",
-    "private_key":
-        "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDbXJ8gf8UA2ozJ\nMyxtmemiQt/+STYkaGicBtlwKWB288eFjMRCReDy42hHInfFuG3rF7PehOrVysoq\nvQ5i9hWnnLSf7TC88o72KmfgmrCATr37+/TEbxvb0ZpTUjS9QNwL44rEgqe2OvNG\nWYMyfrzG0dR5T9P8wVZ2IHc6dbC12Xi75tK9QrPbFkUURAYIc5unhfSA47ibCzqi\nqzHC3kh+9bITS/P4Jat5M2dbGSSdfOEPjsaPpsJniPzhf7me7SXwz4AjH7MhWJeC\nnkaFmO+Ris7OGcyagitruDq0DvoJJjWoIfbyTI7A12zN6YkxHKCgsSe5J0bsZ8+N\noDs29hIfAgMBAAECggEABheAY8qokel/12aQaUrI7jSlO86UrlYn8Y1PJIpBn4wN\nmkviV2TRZm1iS/dtFBSXGNxDpn5SdzV2f9FYQO9MkqcLbRWNMPIbfkKXN+mT1Txa\nklDg70OWpngfrQivZkIS2lGrXOGz/p+MefuqZRCX9X2GRQgufupvmEA2j20NRz+B\nrQomqbBcvFnQ743wv6qG5Ailp+JGAg19/KvwTSOctEYlzoj/jqv4ChIzWM/CzrhH\nuVZg4WdjnEnylnSvC7bRctpT/xw9jlb1FBNfphJnkDySq7k1KAPdO8dqPNHsHHKy\nqyNBInk/KsAnsC7KPCk9w/qhEg9f5bMQWaUEmLaxoQKBgQDwSUJbvUZkWiW7ckuV\nkzgZK+3bGIDkIashzucnW8+v6hgYE4gEy8wTSfZ3QB2NbDPY52WZx9hQFVzE9RBS\nnWC7MpjLORBSML93raxzYzF/jtbVJzvoYU5EKp/a2WbxoP8wPjlHqMrTnq3bK74I\nd6rZ2bhjQEjqmZZdD1JVmoxGPQKBgQDptQ7YW9UlxKjm1nQtRzK14p8tBn9CJHzJ\nMOSJaDHIa/Rgg5cxDFimhrHEW8/CKql2NM5HQUxVq/m9Nj494KdCj4vTqDK7KVow\n2NHLDdw8cGXsG1mMR7ASEJ3/nC5fSD/mxek1g6+i8L7jKxrYpLNVg/Zeia9i7JB0\npO8PAKmbiwKBgCSye5D5OjvvTJ3xGbwRTNsDS4NPnbe5sKIsMD9hlTl/nghnSzm4\nSkWT4TFbOGg140E4Ldsrm0y3xoBKESEc6f4M/yriXyy+Ry+m9ZR1zMR3czYAlPSr\nj8F3ZQyOcVtrxC2BA0x/aeKh9Flpt88hP5Wf27pEwh4aMM2rnl52iP/dAoGAYIzn\ndCUEOtUzPiKM3oPShGf6gLx1aJrwXqHvWIEOSBGpZRIYLTA/k5SD7m5Lt5iuZ+JK\n8g8c/SvOQggd0Kx2DT6GcsvDIaVk2FdK3Mt+GA4LXW6zIQwgxmXNEGOymLSdibZr\nsSsVLYiuI+WT8rqgSAz7hHT3WzQGPdpB1P3eFB8CgYEAvbs3nsRDpZg5fkHXyTOS\n8RmxzMVfVTyVMxSeZA0FjrndkbRJOGDg1OnpjjjM+3gCfIJ2OBBKXzdU+xmAmSdz\noNFzb67u21kNfaayPR/Oruw0tJNjX7BZMVS9RPRe6xQFbP/yLqQNU0AqJAKlaGqp\nRjjQLMCzWcIfRK9Z+yrxad4=\n-----END PRIVATE KEY-----\n",
-    "client_email": "cropsync@cropsync-419318.iam.gserviceaccount.com",
-    "client_id": "114537892275223410551",
-    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-    "token_uri": "https://oauth2.googleapis.com/token",
-    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-    "client_x509_cert_url":
-        "https://www.googleapis.com/robot/v1/metadata/x509/cropsync%40cropsync-419318.iam.gserviceaccount.com",
-    "universe_domain": "googleapis.com"
-  };
-
+ class _SheetPageState extends State<SheetPage> {
+  late final String SheetId;
+  late final Map<String, dynamic> credentials;
   late final GSheets gsheets;
   late Spreadsheet GSheetsController;
   List<Map<String, dynamic>> allRows = [];
@@ -40,13 +26,25 @@ class _SheetPageState extends State<SheetPage> {
   @override
   void initState() {
     super.initState();
+
+    // Access the credentials and sheet ID from environment variables
+    SheetId = dotenv.env['SHEETS_ID']!;
+
+    // Parse the credentials JSON string into a Map
+    final credentialsString = dotenv.env['GSHEETS_CREDENTIAL'];
+    if (credentialsString != null) {
+      credentials = Map<String, dynamic>.from(json.decode(credentialsString));
+    } else {
+      throw Exception('Google Sheets credentials not found in environment variables.');
+    }
+
     gsheets = GSheets(credentials);
     gsheetsInit();
   }
 
-  gsheetsInit() async {
+  void gsheetsInit() async {
     try {
-      GSheetsController = await gsheets.spreadsheet(sheetId);
+      GSheetsController = await gsheets.spreadsheet(SheetId);
 
       Map<String, Map<String, String>> sheetImageMap = {
         'Sheet1': {

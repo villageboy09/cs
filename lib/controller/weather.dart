@@ -1,5 +1,3 @@
-// ignore_for_file: avoid_print
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -8,7 +6,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'weather_provider.dart';
 
 class WeatherPage extends StatelessWidget {
-  const WeatherPage({super.key});
+  const WeatherPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -17,8 +15,9 @@ class WeatherPage extends StatelessWidget {
         builder: (context, weatherProvider, child) {
           if (weatherProvider.currentWeather.isEmpty) {
             return _buildInitialView(context, weatherProvider);
+          } else {
+            return _buildWeatherView(context, weatherProvider);
           }
-          return _buildWeatherView(context, weatherProvider);
         },
       ),
     );
@@ -87,7 +86,6 @@ class WeatherPage extends StatelessWidget {
               children: [
                 _buildHourlyForecast(weatherProvider),
                 _buildDailyForecast(weatherProvider),
-                _buildEventsWidget(weatherProvider),
               ],
             ),
           ),
@@ -103,7 +101,6 @@ class WeatherPage extends StatelessWidget {
           _buildCurrentWeather(weatherProvider),
           _buildHourlyForecast(weatherProvider),
           _buildDailyForecast(weatherProvider),
-          _buildEventsWidget(weatherProvider),
         ],
       ),
     );
@@ -202,7 +199,7 @@ class WeatherPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '15 Days Forecast',
+              'Daily Forecast',
               style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
             ),
             const SizedBox(height: 10),
@@ -248,93 +245,35 @@ class WeatherPage extends StatelessWidget {
     );
   }
 
-  Widget _buildEventsWidget(WeatherProvider weatherProvider) {
-    if (weatherProvider.weatherAlerts == null || weatherProvider.weatherAlerts.isEmpty) {
-      return Card(
-        margin: const EdgeInsets.all(16),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        color: Colors.white.withOpacity(0.2),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Text(
-            'No weather alerts available',
-            style: GoogleFonts.poppins(fontSize: 16, color: Colors.white),
-          ),
-        ),
-      );
+    IconData _getWeatherIcon(String? condition) {
+    if (condition == null || condition.isEmpty) {
+      return FontAwesomeIcons.circleQuestion;
     }
+    List conditions = condition.toLowerCase().split(',').map((e) => e.trim()).toList();
+    final Map conditionIcons = {
+      'rain': FontAwesomeIcons.cloudRain,
+      'partly cloudy': FontAwesomeIcons.cloudSun,
+      'sunny': FontAwesomeIcons.sun,
+      'cloudy': FontAwesomeIcons.cloud,
+      'snow': FontAwesomeIcons.snowflake,
+      'thunderstorm': FontAwesomeIcons.bolt,
+      'overcast': FontAwesomeIcons.cloud,
+    };
+    final Map conditionKeywords = {
+      'partially cloudy': 'partly cloudy',
+      'overcast': 'overcast',
+    };
 
-    return Card(
-      margin: const EdgeInsets.all(16),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      color: Colors.white.withOpacity(0.2),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Weather Alerts',
-              style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
-            ),
-            const SizedBox(height: 10),
-            ...weatherProvider.weatherAlerts.map((alert) {
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4),
-                child: Text(
-                  '${alert['event']}: ${alert['description']}',
-                  style: GoogleFonts.poppins(fontSize: 16, color: Colors.white),
-                ),
-              );
-            }).toList(),
-          ],
-        ),
-      ),
-    );
-  }
-
-  IconData _getWeatherIcon(String? condition) {
-  print('Condition: $condition'); // Debugging line
-
-  if (condition == null || condition.isEmpty) {
-    return FontAwesomeIcons.circleQuestion;
-  }
-
-  // Normalize the condition string and split by commas
-  List<String> conditions = condition.toLowerCase().split(',').map((e) => e.trim()).toList();
-
-  // Define keywords for each icon
-  final Map<String, IconData> conditionIcons = {
-    'rain': FontAwesomeIcons.cloudRain,
-    'partly cloudy': FontAwesomeIcons.cloudSun,
-    'sunny': FontAwesomeIcons.sun,
-    'cloudy': FontAwesomeIcons.cloud,
-    'snow': FontAwesomeIcons.snowflake,
-    'thunderstorm': FontAwesomeIcons.bolt,
-    'overcast': FontAwesomeIcons.cloud // Add any other specific terms here
-  };
-
-  // Define keywords for partial matches
-  final Map<String, String> conditionKeywords = {
-    'partially cloudy': 'partly cloudy',
-    'overcast': 'overcast',
-    // Add any other variations here
-  };
-
-  // Normalize conditions and match against keywords
-  for (String cond in conditions) {
-    for (String keyword in conditionKeywords.keys) {
-      if (cond.contains(keyword)) {
-        cond = conditionKeywords[keyword]!;
+    for (String cond in conditions) {
+      for (String keyword in conditionKeywords.keys) {
+        if (cond.contains(keyword)) {
+          cond = conditionKeywords[keyword]!;
+          if (conditionIcons.containsKey(cond)) {
+            return conditionIcons[cond]!;
+          }
+        }
       }
     }
-    
-    if (conditionIcons.containsKey(cond)) {
-      return conditionIcons[cond]!;
-    }
+    return FontAwesomeIcons.circleQuestion;
   }
-
-  // Default icon if no condition matches
-  return FontAwesomeIcons.circleQuestion;
-}
-}
+} 

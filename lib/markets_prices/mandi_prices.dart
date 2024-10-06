@@ -1,7 +1,10 @@
 // ignore_for_file: library_private_types_in_public_api, avoid_print
 
+import 'dart:convert';
+
 import 'package:cropsync/users/sidebar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:gsheets/gsheets.dart';
 import 'package:shimmer/shimmer.dart';
@@ -14,51 +17,78 @@ class MandiPrices extends StatefulWidget {
 }
 
 class _MandiPricesState extends State<MandiPrices> {
-  final announcementsSheetId = "1rMMbedzEVB9s72rUmwUAEdqlHt5Ri4VCRxmeOe651Yg";
-  final credentials = {
-    "type": "service_account",
-    "project_id": "news-432020",
-    "private_key_id": "8cea6aa039d1e9c6f1d2b2179e66517798544306",
-    "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDI0e2m9k5JSBEk\nDJ9YjyFAWNOiNTE4KEN5L9kiXFtrF665BvoFEgzWLhrlm3XEGJFTtDiwI+kDZy4D\nJk/uf6oYl6xIDCqhhL6FElELYXg8I/dPH6+BAgoYercZ7GHlqO9IQ9UpO5GefanY\nlYza5Cr8+qHzdmawHwxpejcMeHha8QiD6A9OEttBnA0Y2A7dXOc36IsHROdiI/0q\nKpdkY2OS5svHYmaC0YW7e/d88eYKqt7DZVbHWTdf7+YvCglt4MoyiMIdJCTkAqum\nDnBjYpp2RW7V158W6s9gdoOVvzSNqTdlwOcwpKfWn3uoJymcOUCQm/iXKPScJvl5\ncohjLbk3AgMBAAECggEAMVEwskyRvDhpETfSWB7KVTGbQ54ZiMeGjnfcNK6Gut2V\niJX4h48/vMeUzmdnu/Emm25Kb6NaAX5w09AwWAtdG+3/nq/yNjlRyn9NjORycR6K\nCRHoeV+lWA6m8cRV5F8g6FfUPOyGnewRboGHlmfrULZCWHZu0HjHhQ3BAByDvh08\npG+13bsWFdojCNRX6Wb9T62LII2wo6+49J6GfrRj7DaxY9Qa4pYOTyh7ZouaZOH/\nnSRVSW/Co5Nr4bXG0S0d6wASd8U1ljYAOw5traAu7cTdW4O4EW5dxcdEW2amtDx4\n1j6lCYqqyTN4/l3aTLXk+UF2C32iu4NQrs5+26KeaQKBgQD3m0nVDQ+Ok0IBaZZR\nATGS9IgQGeqfd5I/ZixG3ssXdlAnKBfyLLeCiRRUABVAeDzuoYuduHTtsw0GfDar\nAOjbg4n8eUA4rkwdbnD13lPPCNLQ9oejH6lEy+5H9MzLl1+5wB1dl+tf4pCaTa5U\n9q5SUyr6FwxkW3easNUjWiatuQKBgQDPoKEuZ6ZCjs52v7CQMJmkZzcs3dzyM1Vw\nbMfj4T1OALom1C++qYuz4spXvBaiHNZy5Mevwb0aHmw1Fo3Z234lahkpIpRIiav8\npOUp1+gcORy0wU3wYkPaODJm1bcSH+8s0SRlWgbbjkFY26/xRsuR5R/B09qlLsQf\n4Zeqdo6WbwKBgBpqpuXkDtTXQSOFcFQUHIXhMOMG4NFCoIfDDtZAzsoiBUsoK+Xa\nf3mdxl1v5NSL/3Q2J/8bvt3dTHZ0qiB0aGODFSWqif+CGPzK26JfpfFgr507sBzn\nM9fzKejjZTYTYFMg/AEQRDxmn6bWwtKtvstptBwaeWf7mjcWxqaO57GBAoGBAJnj\nFlPMot/l9ITzIqxcOSQvFCf+8Mna3lKLbcQqp0NvKomo7xJDm7XiO9K3J5dUBGX3\nx0EvOTdooQ7f/pcgJekZMDja1kjFMWH53Zgb3H8+nVYjh97JFj1hNYoekKewX5c6\nE93C0h5c23Y+rbMIo80oo1cH7KBNfzOaAs1nPdulAoGAR38l6Qe02sQOBen0c/gV\n1cI5+eafU5K2NefZK3DAqoXf8eccOc/dSOPU3vWHjKXTFw7QEP6cU3unEvstCxRY\nNSmsOfF3XfiQHxVXAJG3QpkXuEBSzbOqVPl78b1diZ9bjtDR8REpagVbjz0w6xfg\nna26q6NFeaswPfBVLoEONMQ=\n-----END PRIVATE KEY-----\n",
-    "client_email": "news-512@news-432020.iam.gserviceaccount.com",
-    "client_id": "101236323039893966383",
-    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-    "token_uri": "https://oauth2.googleapis.com/token",
-    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-    "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/news-512%40news-432020.iam.gserviceaccount.com",
-    "universe_domain": "googleapis.com"
-  };
-
-    late final GSheets gsheets;
+   late final String announcementsSheetId;
+  late final String credentials;
+  
+  late final GSheets gsheets;
   List<Map<String, dynamic>>? announcementsRows;
   Future<void>? _fetchDataFuture;
-  bool _isDataFetched = false; // Track if data has been fetched
+  bool _isDataFetched = false;
+
+  List<String> filteredCommodities = [];
+  List<String> _uniqueCommodities = [];
+  TextEditingController searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
+    _initializeGSheets();
+    searchController.addListener(_filterCommodities);
+  }
+
+  void _initializeGSheets() {
+  final mandiId = dotenv.env['MANDI_ID'];
+  final mandiCredentials = dotenv.env['MANDI_CREDENTIALS'];
+  
+  if (mandiId == null || mandiCredentials == null) {
+    print('Error: Environment variables not set correctly');
+    return;
+  }
+  
+  announcementsSheetId = mandiId;
+  
+  try {
+    // Remove any leading/trailing whitespace and parse the JSON
+    final credentialsJson = json.decode(mandiCredentials.trim());
+    
+    // Convert back to a properly formatted JSON string
+    credentials = json.encode(credentialsJson);
+    
     gsheets = GSheets(credentials);
     _fetchDataFuture = fetchMandiPrices();
+  } catch (e) {
+    print('Error initializing GSheets: $e');
+  }
+}
+  
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
   }
 
   Future<void> fetchMandiPrices() async {
-  if (_isDataFetched || !mounted) return; // Prevent re-fetching and check if mounted
-
-  try {
-    final spreadsheet = await gsheets.spreadsheet(announcementsSheetId);
-    final worksheet = spreadsheet.worksheetByTitle('announcements');
-    announcementsRows = await worksheet?.values.map.allRows();
-    _isDataFetched = true; // Mark data as fetched
-    
-    if (mounted) { // Check if the widget is still mounted before calling setState
-      setState(() {});
+    if (_isDataFetched || !mounted) {
+      return;
     }
-  } catch (e) {
-    if (mounted) { // Check if the widget is still mounted before printing the error
-      print('Error fetching data: $e');
+
+    try {
+      final spreadsheet = await gsheets.spreadsheet(announcementsSheetId);
+      final worksheet = spreadsheet.worksheetByTitle('announcements');
+      announcementsRows = await worksheet?.values.map.allRows();
+      _isDataFetched = true;
+
+      if (mounted) {
+        setState(() {
+          _uniqueCommodities = getUniqueCommodities();
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        print('Error fetching data: $e');
+      }
     }
   }
-}
 
   List<String> getUniqueCommodities() {
     final Set<String> uniqueCommodities = {};
@@ -67,41 +97,82 @@ class _MandiPricesState extends State<MandiPrices> {
         uniqueCommodities.add(row['Commodity']);
       }
     }
-    return uniqueCommodities.toList()..sort(); // Sort alphabetically
+    return uniqueCommodities.toList()..sort();
   }
 
+  void _filterCommodities() {
+    final query = searchController.text.toLowerCase();
+    setState(() {
+      filteredCommodities = _uniqueCommodities.where((commodity) =>
+          commodity.toLowerCase().contains(query)).toList();
+    });
+  }
 
-
- @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.green[50],
       appBar: AppBar(
-        backgroundColor: Colors.teal,
+      backgroundColor: Colors.green[50],
         elevation: 0,
-        title: Text(
-          'Daily Mandi Prices',
-          style: GoogleFonts.poppins(fontWeight: FontWeight.bold, color: Colors.white),
-        ),
-        centerTitle: true,
+        title: Text('Daily Mandi Prices',
+            style: GoogleFonts.poppins(fontWeight: FontWeight.w800, color: Colors.black)),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Image.asset(
+              'assets/S.png',
+              width: 40,
+              height: 40,
+            ),
+          ),
+        ],
       ),
       drawer: const Sidebar(profileImageUrl: '', userName: ''),
       body: SafeArea(
-        child: RefreshIndicator(
-          onRefresh: () async {
-            // Trigger data fetch on refresh
-            await fetchMandiPrices();
-          },
-          child: FutureBuilder<void>(
-            future: _fetchDataFuture,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return _buildShimmerEffect();
-              } else if (snapshot.hasError) {
-                return Center(child: Text('Error: ${snapshot.error}'));
-              } else {
-                return _buildCommodityGrid();
-              }
-            },
+        child: Column(
+          children: [
+            _buildSearchBar(),
+            Expanded(
+              child: RefreshIndicator(
+                onRefresh: () async {
+                  await fetchMandiPrices();
+                },
+                child: FutureBuilder<void>(
+                  future: _fetchDataFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return _buildShimmerEffect();
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    } else {
+                      return _buildCommodityGrid();
+                    }
+                  },
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSearchBar() {
+    return Container(
+      
+      padding: const EdgeInsets.all(16),
+      color: Colors.green[50],
+      child: TextField(
+        controller: searchController,
+        decoration: InputDecoration(
+          hintText: 'Search commodities...',
+          prefixIcon: const Icon(Icons.search, color: Colors.green),
+          filled: true,
+          fillColor: Colors.white,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30),
+            borderSide: BorderSide.none,
           ),
         ),
       ),
@@ -119,7 +190,7 @@ class _MandiPricesState extends State<MandiPrices> {
           crossAxisSpacing: 16,
           mainAxisSpacing: 16,
         ),
-        itemCount: 8, // Show 8 shimmer items
+        itemCount: 8,
         itemBuilder: (context, index) => Container(
           decoration: BoxDecoration(
             color: Colors.white,
@@ -131,21 +202,26 @@ class _MandiPricesState extends State<MandiPrices> {
   }
 
   Widget _buildCommodityGrid() {
-    final uniqueCommodities = getUniqueCommodities();
+    final commoditiesToShow = searchController.text.isEmpty
+        ? getUniqueCommodities()
+        : filteredCommodities;
 
-    return GridView.builder(
-      padding: const EdgeInsets.all(16),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 16,
-        mainAxisSpacing: 16,
-      ),
-      itemCount: uniqueCommodities.length,
-      itemBuilder: (context, index) {
-        final commodityName = uniqueCommodities[index];
-        return _buildCommodityCard(commodityName);
-      },
-    );
+    return commoditiesToShow.isEmpty
+        ? Center(child: Text('No commodities found', style: GoogleFonts.poppins()))
+        : GridView.builder(
+            padding: const EdgeInsets.all(16),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
+              childAspectRatio: 1.1,
+            ),
+            itemCount: commoditiesToShow.length,
+            itemBuilder: (context, index) {
+              final commodityName = commoditiesToShow[index];
+              return _buildCommodityCard(commodityName);
+            },
+          );
   }
 
   Widget _buildCommodityCard(String commodityName) {
@@ -156,40 +232,36 @@ class _MandiPricesState extends State<MandiPrices> {
           MaterialPageRoute(
             builder: (context) => CommodityDetailsPage(
               commodityName: commodityName,
-              relatedRows: announcementsRows!.where((row) => row['Commodity'] == commodityName).toList(),
+              relatedRows: announcementsRows!
+                  .where((row) => row['Commodity'] == commodityName)
+                  .toList(),
             ),
           ),
         );
       },
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.teal.shade100,
-          borderRadius: BorderRadius.circular(10),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.3),
-              spreadRadius: 1,
-              blurRadius: 5,
-              offset: const Offset(0, 3),
+      child: Card(
+        elevation: 4,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.teal.shade200, Colors.teal.shade100],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
-          ],
-        ),
-        child: Column(
-          children: [
-            Expanded(
-              child: Center(
-                child: Text(
-                  commodityName,
-                  style: GoogleFonts.poppins(
-                    color: Colors.teal.shade700,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
+            borderRadius: BorderRadius.circular(15),
+          ),
+          child: Center(
+            child: Text(
+              commodityName,
+              style: GoogleFonts.poppins(
+                color: Colors.teal.shade800,
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
               ),
+              textAlign: TextAlign.center,
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -213,7 +285,8 @@ class CommodityDetailsPage extends StatelessWidget {
         backgroundColor: Colors.teal,
         title: Text(
           commodityName,
-          style: GoogleFonts.poppins(fontWeight: FontWeight.bold, color: Colors.white),
+          style: GoogleFonts.poppins(
+              fontWeight: FontWeight.bold, color: Colors.white),
         ),
       ),
       body: ListView.builder(
@@ -226,7 +299,7 @@ class CommodityDetailsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildCommodityCard(BuildContext context, Map<String, dynamic> row) {
+Widget _buildCommodityCard(BuildContext context, Map<String, dynamic> row) {
     final screenSize = MediaQuery.of(context).size;
     final isSmallScreen = screenSize.width < 600;
     final fontSize = isSmallScreen ? 14.0 : 16.0;
@@ -234,7 +307,7 @@ class CommodityDetailsPage extends StatelessWidget {
 
     return Center(
       child: Card(
-        margin: const EdgeInsets.symmetric(vertical: 12),
+        margin: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         elevation: 8,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
@@ -257,7 +330,8 @@ class CommodityDetailsPage extends StatelessWidget {
               _buildDetailRow(context, 'District:', row['District'] ?? 'N/A', fontSize: fontSize),
               _buildDetailRow(context, 'Market:', row['Market'] ?? 'N/A', fontSize: fontSize),
               _buildDetailRow(context, 'Variety:', row['Variety'] ?? 'N/A', fontSize: fontSize),
-              _buildDetailRow(context, 'Modal Price:', '₹ ${row['Modal Price'] ?? 'N/A'}', fontSize: fontSize, isPrice: true),
+              _buildDetailRow(context, 'Modal Price:', '₹ ${row['Modal Price'] ?? 'N/A'}',
+                  fontSize: fontSize, isPrice: true),
             ],
           ),
         ),
@@ -265,7 +339,8 @@ class CommodityDetailsPage extends StatelessWidget {
     );
   }
 
-  Widget _buildDetailRow(BuildContext context, String label, String value, {bool isPrice = false, required double fontSize}) {
+  Widget _buildDetailRow(BuildContext context, String label, String value,
+      {bool isPrice = false, required double fontSize}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
