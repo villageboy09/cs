@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "938319022397",
-    "project_id": "cropsync-ed120",
-    "storage_bucket": "cropsync-ed120.appspot.com"
+    "project_number": "460953027509",
+    "project_id": "cropsync-244a3",
+    "storage_bucket": "cropsync-244a3.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:938319022397:android:9099b8e0c9c1ff933b1d54",
+        "mobilesdk_app_id": "1:460953027509:android:3499a2b07696e15305cffc",
         "android_client_info": {
           "package_name": "com.cropsync.CropSync"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCwtLozR3uRV194CFVmNSVGezA3MvbGrZQ"
+          "current_key": "AIzaSyD-2PNFk5n8ayBiHdtuoVWkDGlOVY6bzqg"
         }
       ],
       "services": {

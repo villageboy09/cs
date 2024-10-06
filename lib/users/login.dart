@@ -1,5 +1,6 @@
-// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
+// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously, avoid_print
 
+import 'package:cropsync/users/sidebar_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart'; // Import Firebase Auth
 import 'package:provider/provider.dart';
@@ -19,37 +20,75 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   String _errorMessage = '';
   
-Future<void> _login() async {
-  final email = _emailController.text.trim();
-  final password = _passwordController.text.trim();
+  Future<void> _login() async {
+    setState(() {
+      _errorMessage = '';
+    });
 
-  try {
-    final authProvider = Provider.of<custom_auth.AuthProvider>(context, listen: false);
-    await authProvider.signIn(email, password);
-    
-    // If signIn is successful, navigate to the home screen
-    Navigator.pushNamed(context, '/');
-  } on FirebaseAuthException catch (e) {
-    // Check for specific error codes
-    if (e.code == 'wrong-password') {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    try {
+      // Show loading indicator
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(child: CircularProgressIndicator()),
+      );
+
+      // Perform login
+      final authProvider = Provider.of<custom_auth.AuthProvider>(context, listen: false);
+      await authProvider.signIn(email, password);
+      
+      // Get sidebar provider
+      final sidebarProvider = Provider.of<SidebarProvider>(context, listen: false);
+      
+      // Update user data in sidebar provider
+      await sidebarProvider.updateUserData();
+      
+      // Close loading indicator
+      Navigator.pop(context);
+
+      // Verify that user data was fetched
+      print('Login successful - Current user: ${FirebaseAuth.instance.currentUser?.uid}');
+      print('Sidebar provider state - Name: ${sidebarProvider.userName}, Image: ${sidebarProvider.profileImageUrl}');
+
+      // Navigate to home screen
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        '/', // Your home route
+        (route) => false,
+      );
+    } on FirebaseAuthException catch (e) {
+      // Close loading indicator if it's showing
+      if (Navigator.canPop(context)) {
+        Navigator.pop(context);
+      }
+
       setState(() {
-        _errorMessage = 'Wrong password. Please try again.';
+        if (e.code == 'wrong-password') {
+          _errorMessage = 'Wrong password. Please try again.';
+        } else if (e.code == 'user-not-found') {
+          _errorMessage = 'No user found with this email.';
+        } else if (e.code == 'invalid-email') {
+          _errorMessage = 'The email address is not valid.';
+        } else {
+          _errorMessage = 'Login failed: ${e.message}';
+        }
       });
-    } else if (e.code == 'user-not-found') {
+      print('Login error: ${e.code} - ${e.message}'); // Debug log
+    } catch (e) {
+      // Close loading indicator if it's showing
+      if (Navigator.canPop(context)) {
+        Navigator.pop(context);
+      }
+
       setState(() {
-        _errorMessage = 'No user found with this email.';
+        _errorMessage = 'An unexpected error occurred';
       });
-    } else if (e.code == 'invalid-email') {
-      setState(() {
-        _errorMessage = 'The email address is not valid.';
-      });
-    } else {
-      setState(() {
-        _errorMessage = 'Either your Email or Password are incorrect. Please try again.';
-      });
+      print('Unexpected error during login: $e'); // Debug log
     }
-  } 
-}
+  }
   // Method to show the forgot password modal
   void _showForgotPasswordDialog() {
     showModalBottomSheet(

@@ -2,13 +2,14 @@
 
 import 'dart:io';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cropsync/users/sidebar_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // Changed to Firestore
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({Key? key}) : super(key: key);
@@ -20,76 +21,112 @@ class DashboardPage extends StatefulWidget {
 class _DashboardPageState extends State<DashboardPage> {
   final TextEditingController _nameController = TextEditingController();
   XFile? _image;
-  bool _isEditing = false; // State variable to track edit mode
+  bool _isEditing = false;
+  
+  // Initialize Firestore and Firebase Storage
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseStorage _storage = FirebaseStorage.instance;
 
   @override
   void initState() {
     super.initState();
-    _checkUserDocument(); // Check if user document exists on init
+    _checkUserDocument();
   }
 
   Future<void> _checkUserDocument() async {
-    final sidebarProvider =
-        Provider.of<SidebarProvider>(context, listen: false);
+    final sidebarProvider = Provider.of<SidebarProvider>(context, listen: false);
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       try {
-        final docRef =
-            FirebaseFirestore.instance.collection('users').doc(user.uid);
-        final doc = await docRef.get();
+        final userDoc = await _firestore.collection('users').doc(user.uid).get();
 
-        if (!doc.exists) {
-          // Create a new user document if it doesn't exist
-          await docRef.set({
+        if (userDoc.exists) {
+          await sidebarProvider.updateUserData();
+        } else {
+          // Create new user document if it doesn't exist
+          await _firestore.collection('users').doc(user.uid).set({
             'name': user.displayName ?? 'User',
             'profileImageUrl': '',
-            // Add other default fields as necessary
+            'enrolledCourses': [],
+            'createdAt': FieldValue.serverTimestamp(),
           });
+          print('New user created in Firestore: ${user.uid}');
+          await sidebarProvider.updateUserData();
         }
-
-        // After creating or confirming the document, update the SidebarProvider
-        await sidebarProvider.updateUserData();
       } catch (e) {
-        print('Error updating user data: $e');
+        print('Error checking/updating user document: $e');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error connecting to database: $e')),
+          );
+        }
       }
     }
   }
 
   Future<void> _updateProfile() async {
-    final sidebarProvider =
-        Provider.of<SidebarProvider>(context, listen: false);
+    final sidebarProvider = Provider.of<SidebarProvider>(context, listen: false);
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      Map<String, dynamic> updates = {};
+      try {
+        Map<String, dynamic> updates = {};
 
-      if (_nameController.text.isNotEmpty) {
-        updates['name'] = _nameController.text;
+        if (_nameController.text.isNotEmpty) {
+          updates['name'] = _nameController.text;
+        }
+
+        // Upload the image to Firebase Storage if selected
+        if (_image != null) {
+          final imageUrl = await _uploadImage(_image!);
+          updates['profileImageUrl'] = imageUrl;
+        }
+
+        if (updates.isNotEmpty) {
+          await _firestore.collection('users').doc(user.uid).update(updates);
+          await sidebarProvider.updateUserData();
+
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Profile updated successfully')),
+            );
+          }
+
+          setState(() {
+            _isEditing = false;
+          });
+        } else {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('No changes to update')),
+            );
+          }
+        }
+      } catch (e) {
+        print('Error updating profile: $e');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error updating profile: $e')),
+          );
+        }
       }
+    }
+  }
 
-      if (_image != null) {
-        updates['profileImageUrl'] = _image?.path;
-      }
+  Future<String> _uploadImage(XFile image) async {
+    try {
+      final fileName = '${FirebaseAuth.instance.currentUser!.uid}/profileImage/${DateTime.now().millisecondsSinceEpoch}.jpg';
+      final storageRef = _storage.ref().child(fileName);
 
-      if (updates.isNotEmpty) {
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(user.uid)
-            .set(updates, SetOptions(merge: true));
-
-        await sidebarProvider.updateUserData(); // Inform the SidebarProvider
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Profile updated successfully')),
-        );
-
-        setState(() {
-          _isEditing = false;
-        });
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('No changes to update')),
-        );
-      }
+      // Upload the image file
+      await storageRef.putFile(File(image.path));
+      
+      // Get the download URL
+      String downloadUrl = await storageRef.getDownloadURL();
+      print('Image uploaded to Firebase Storage, URL: $downloadUrl'); // Debug log
+      return downloadUrl;
+    } catch (e) {
+      print('Error uploading image: $e');
+      rethrow; // Rethrow the error to be caught in _updateProfile
     }
   }
 
@@ -100,22 +137,19 @@ class _DashboardPageState extends State<DashboardPage> {
     setState(() {
       if (pickedFile != null) {
         _image = pickedFile;
-        // Update SidebarProvider with new image URL if needed
-        final sidebarProvider =
-            Provider.of<SidebarProvider>(context, listen: false);
-        sidebarProvider.updateUserData(); // Update user data with new image URL
+        final sidebarProvider = Provider.of<SidebarProvider>(context, listen: false);
+        sidebarProvider.updateUserData();
       }
     });
   }
 
- 
-   @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-            backgroundColor: Colors.green[50],
+      backgroundColor: Colors.green[50],
       appBar: AppBar(
         title: Text('Dashboard', style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
-      backgroundColor: Colors.green[50],
+        backgroundColor: Colors.green[50],
         elevation: 0,
       ),
       body: SingleChildScrollView(
@@ -134,7 +168,7 @@ class _DashboardPageState extends State<DashboardPage> {
     final user = FirebaseAuth.instance.currentUser;
 
     return StreamBuilder<DocumentSnapshot>(
-      stream: FirebaseFirestore.instance.collection('users').doc(user?.uid).snapshots(),
+      stream: _firestore.collection('users').doc(user!.uid).snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -145,8 +179,8 @@ class _DashboardPageState extends State<DashboardPage> {
         }
 
         final userData = snapshot.data?.data() as Map<String, dynamic>?;
-        final profileImageUrl = userData?['profileImageUrl'];
-        final userName = userData?['name'] ?? '';
+        final profileImageUrl = userData?['profileImageUrl'] as String?;
+        final userName = userData?['name'] as String? ?? '';
 
         _nameController.text = userName;
 
@@ -164,7 +198,7 @@ class _DashboardPageState extends State<DashboardPage> {
                     radius: 60,
                     backgroundImage: _getProfileImage(profileImageUrl),
                     child: (profileImageUrl == null && _image == null)
-                        ? const Icon(Icons.person, size: 0.0001, color: Colors.transparent)
+                        ? const Icon(Icons.person, size: 60, color: Colors.grey)
                         : null,
                   ),
                   if (_isEditing)
@@ -208,8 +242,9 @@ class _DashboardPageState extends State<DashboardPage> {
                     _isEditing = !_isEditing;
                   });
                 },
-                icon: Icon(_isEditing ? Icons.save : Icons.edit,color: Colors.black,),
-                label: Text(_isEditing ? 'Save Profile' : 'Edit Profile',style: GoogleFonts.poppins(fontSize: 16,color: Colors.black),),
+                icon: Icon(_isEditing ? Icons.save : Icons.edit, color: Colors.black),
+                label: Text(_isEditing ? 'Save Profile' : 'Edit Profile', 
+                     style: GoogleFonts.poppins(fontSize: 16, color: Colors.black)),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.lightGreenAccent,
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
@@ -228,8 +263,8 @@ class _DashboardPageState extends State<DashboardPage> {
   ImageProvider? _getProfileImage(String? profileImageUrl) {
     if (_isEditing && _image != null) {
       return FileImage(File(_image!.path));
-    } else if (profileImageUrl != null) {
-      return FileImage(File(profileImageUrl));
+    } else if (profileImageUrl != null && profileImageUrl.isNotEmpty) {
+      return NetworkImage(profileImageUrl); // Use NetworkImage for URLs
     }
     return null;
   }
@@ -237,8 +272,8 @@ class _DashboardPageState extends State<DashboardPage> {
   Widget _buildEnrolledCoursesSection() {
     final user = FirebaseAuth.instance.currentUser;
 
-    return StreamBuilder(
-      stream: FirebaseFirestore.instance.collection('users').doc(user?.uid).snapshots(),
+    return StreamBuilder<DocumentSnapshot>(
+      stream: _firestore.collection('users').doc(user!.uid).snapshots(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -248,69 +283,37 @@ class _DashboardPageState extends State<DashboardPage> {
           return Center(child: Text('Error loading courses', style: GoogleFonts.poppins(color: Colors.red)));
         }
 
-        final userData = snapshot.data?.data() as Map?;
-        final enrolledCourses = List.from(userData?['enrolledCourses'] ?? []);
+        final userData = snapshot.data?.data() as Map<String, dynamic>?;
+        final enrolledCourses = userData?['enrolledCourses'] as List<dynamic>? ?? [];
 
         return Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.green.shade50,
             borderRadius: BorderRadius.circular(16),
+            color: Colors.white,
           ),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Center(
-                child: Text(
-                  'Enrolled Courses',
-                  style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-              ),
+              Text('Enrolled Courses', style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.bold)),
               const SizedBox(height: 16),
-              if (enrolledCourses.isNotEmpty)
-                ListView.separated(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: enrolledCourses.length,
-                  separatorBuilder: (context, index) => const SizedBox(height: 12),
-                  itemBuilder: (context, index) {
-                    return _buildCourseCard(enrolledCourses[index]);
-                  },
-                )
-              else
-                Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Text(
-                      'No courses enrolled yet.',
-                      style: GoogleFonts.poppins(fontSize: 16),
-                      textAlign: TextAlign.center,
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: enrolledCourses.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    title: Text(
+                      enrolledCourses[index].toString(),
+                      style: GoogleFonts.poppins(),
                     ),
-                  ),
-                ),
+                  );
+                },
+              ),
             ],
           ),
         );
       },
-    );
-  }
-
-  Widget _buildCourseCard(String course) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        title: Text(course, style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
-        trailing: const Icon(Icons.arrow_forward_ios, color: Colors.green),
-        onTap: () {
-          if (course == 'Crop Consultant/Agronomist') {
-            Navigator.pushReplacementNamed(context, '/agronomistCourse');
-          } else if (course == 'Supply Chain Manager in Agriculture') {
-            Navigator.pushReplacementNamed(context, '/supplyChainCourse');
-          }
-        },
-      ),
     );
   }
 }

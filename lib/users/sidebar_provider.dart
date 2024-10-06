@@ -1,8 +1,8 @@
 // ignore_for_file: avoid_print
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SidebarProvider with ChangeNotifier {
   String _profileImageUrl = '';
@@ -33,14 +33,25 @@ class SidebarProvider with ChangeNotifier {
     try {
       User? user = FirebaseAuth.instance.currentUser;
       if (user != null) {
-        DocumentSnapshot userData = await FirebaseFirestore.instance
-            .collection('users')
-            .doc(user.uid)
-            .get();
+        // Fetch user data from Firestore
+        DocumentReference userRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
+        
+        DocumentSnapshot userDataSnapshot = await userRef.get();
 
-        _profileImageUrl = userData['profileImageUrl'] ?? '';
-        _userName = userData['name'] ?? 'User';
+        if (userDataSnapshot.exists) {
+          // Check and retrieve profile image and name from Firestore
+          Map<String, dynamic>? userData = userDataSnapshot.data() as Map<String, dynamic>?;
+
+          _profileImageUrl = userData?['profileImageUrl'] ?? '';
+          _userName = userData?['name'] ?? 'User';
+          print('Fetched user data - Name: $_userName, Image: $_profileImageUrl'); // Debug log
+        } else {
+          print('User data not found in Firestore'); // Debug log
+          _profileImageUrl = '';
+          _userName = 'User';
+        }
       } else {
+        print('No current user found'); // Debug log
         _profileImageUrl = '';
         _userName = 'Guest';
       }

@@ -41,48 +41,49 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyDluitXWo4L6r37Ek4cEFWe8PW-aNXAKyE',
-    appId: '1:938319022397:web:f021ce20f6596d873b1d54',
-    messagingSenderId: '938319022397',
-    projectId: 'cropsync-ed120',
-    authDomain: 'cropsync-ed120.firebaseapp.com',
-    storageBucket: 'cropsync-ed120.appspot.com',
-    measurementId: 'G-JHD9EP97D5',
+    apiKey: 'AIzaSyBkD1eBCVqKJSG3DK0xjXsD9LOXnS1EkZM',
+    appId: '1:460953027509:web:a99c35cd1a88ad7705cffc',
+    messagingSenderId: '460953027509',
+    projectId: 'cropsync-244a3',
+    authDomain: 'cropsync-244a3.firebaseapp.com',
+    storageBucket: 'cropsync-244a3.appspot.com',
+    measurementId: 'G-CERYXG5454',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCwtLozR3uRV194CFVmNSVGezA3MvbGrZQ',
-    appId: '1:938319022397:android:9099b8e0c9c1ff933b1d54',
-    messagingSenderId: '938319022397',
-    projectId: 'cropsync-ed120',
-    storageBucket: 'cropsync-ed120.appspot.com',
+    apiKey: 'AIzaSyD-2PNFk5n8ayBiHdtuoVWkDGlOVY6bzqg',
+    appId: '1:460953027509:android:3499a2b07696e15305cffc',
+    messagingSenderId: '460953027509',
+    projectId: 'cropsync-244a3',
+    storageBucket: 'cropsync-244a3.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDRpK0rntriyux1YoEjMBWlu7YIQEP2FiU',
-    appId: '1:938319022397:ios:c642aeb0d88a63463b1d54',
-    messagingSenderId: '938319022397',
-    projectId: 'cropsync-ed120',
-    storageBucket: 'cropsync-ed120.appspot.com',
+    apiKey: 'AIzaSyA5crlFkkuCcszQga-40Qimar_4xXmuCAE',
+    appId: '1:460953027509:ios:25381a687d0ceec705cffc',
+    messagingSenderId: '460953027509',
+    projectId: 'cropsync-244a3',
+    storageBucket: 'cropsync-244a3.appspot.com',
     iosBundleId: 'com.example.panache14',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyDRpK0rntriyux1YoEjMBWlu7YIQEP2FiU',
-    appId: '1:938319022397:ios:c642aeb0d88a63463b1d54',
-    messagingSenderId: '938319022397',
-    projectId: 'cropsync-ed120',
-    storageBucket: 'cropsync-ed120.appspot.com',
+    apiKey: 'AIzaSyA5crlFkkuCcszQga-40Qimar_4xXmuCAE',
+    appId: '1:460953027509:ios:25381a687d0ceec705cffc',
+    messagingSenderId: '460953027509',
+    projectId: 'cropsync-244a3',
+    storageBucket: 'cropsync-244a3.appspot.com',
     iosBundleId: 'com.example.panache14',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyDluitXWo4L6r37Ek4cEFWe8PW-aNXAKyE',
-    appId: '1:938319022397:web:4a9055afac7a33be3b1d54',
-    messagingSenderId: '938319022397',
-    projectId: 'cropsync-ed120',
-    authDomain: 'cropsync-ed120.firebaseapp.com',
-    storageBucket: 'cropsync-ed120.appspot.com',
-    measurementId: 'G-FD2E9P28G6',
+    apiKey: 'AIzaSyBkD1eBCVqKJSG3DK0xjXsD9LOXnS1EkZM',
+    appId: '1:460953027509:web:a23430f7e9fc8c4305cffc',
+    messagingSenderId: '460953027509',
+    projectId: 'cropsync-244a3',
+    authDomain: 'cropsync-244a3.firebaseapp.com',
+    storageBucket: 'cropsync-244a3.appspot.com',
+    measurementId: 'G-ZYY9TCQ7BB',
   );
+
 }
