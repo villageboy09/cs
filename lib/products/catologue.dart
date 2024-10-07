@@ -49,7 +49,7 @@ class ProductCatalogPage extends StatelessWidget {
               ),
             ],
       ),
-      drawer: const Sidebar(profileImageUrl: '', userName: ''),
+      drawer: const Sidebar( userName: '', profileImagePath: '',),
       body: Column(
         children: [
           Expanded(

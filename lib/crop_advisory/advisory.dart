@@ -39,7 +39,7 @@ class CropAdvisoryPage extends StatelessWidget {
               ),
             ],
           ),
-          drawer: const Sidebar(profileImageUrl: '', userName: ''),
+          drawer: const Sidebar(userName: '', profileImagePath: '',),
           body: _buildBody(context, appLocalizations),
         );
       },

@@ -36,7 +36,7 @@ class CoursesPage extends StatelessWidget {
         ),
         centerTitle: true,
       ),
-      drawer: const Sidebar(profileImageUrl: '', userName: ''),
+      drawer: const Sidebar( userName: '', profileImagePath: '',),
 
       body: FutureBuilder<List<String>>(
         future: _getEnrolledCourses(),

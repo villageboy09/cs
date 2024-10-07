@@ -52,7 +52,7 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
           ),
         ],
       ),
-      drawer: const Sidebar(profileImageUrl: '', userName: ''),
+      drawer: const Sidebar( userName: '', profileImagePath: '',),
       body: CustomScrollView(
         controller: _scrollController,
         physics: const ClampingScrollPhysics(),

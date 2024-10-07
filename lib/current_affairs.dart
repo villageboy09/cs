@@ -76,7 +76,7 @@ class _CurrentAffairsPageState extends State<CurrentAffairsPage> {
           ),
         ],
       ),
-      drawer: const Sidebar(profileImageUrl: '', userName: ''),
+      drawer: const Sidebar( userName: '', profileImagePath: '',),
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: fetchCurrentAffairs,

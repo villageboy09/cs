@@ -51,7 +51,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       // Verify that user data was fetched
       print('Login successful - Current user: ${FirebaseAuth.instance.currentUser?.uid}');
-      print('Sidebar provider state - Name: ${sidebarProvider.userName}, Image: ${sidebarProvider.profileImageUrl}');
+      print('Sidebar provider state - Name: ${sidebarProvider.userName}, Image: ${sidebarProvider.profileImagePath}');
 
       // Navigate to home screen
       Navigator.pushNamedAndRemoveUntil(

@@ -49,7 +49,7 @@ class _ChatScreenState extends State<ChatScreen> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      drawer: const Sidebar(profileImageUrl: '', userName: '',),
+      drawer: const Sidebar( userName: '', profileImagePath: '',),
 
       body: const ChatWidget(apiKey: _apiKey),
     );

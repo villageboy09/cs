@@ -128,7 +128,7 @@ class _MandiPricesState extends State<MandiPrices> {
           ),
         ],
       ),
-      drawer: const Sidebar(profileImageUrl: '', userName: ''),
+      drawer: const Sidebar( userName: '', profileImagePath: '',),
       body: SafeArea(
         child: Column(
           children: [

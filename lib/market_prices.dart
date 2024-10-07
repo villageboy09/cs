@@ -34,8 +34,8 @@ class MarketpricesPage extends StatelessWidget {
         centerTitle: true,
       ),
       drawer: const Sidebar(
-        profileImageUrl: '',
-        userName: '',
+        
+        userName: '', profileImagePath: '',
       ),
       body: const MarketpricesForm(),
     );

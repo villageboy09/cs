@@ -8,12 +8,12 @@ import 'package:cropsync/users/sidebar_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class Sidebar extends StatelessWidget {
-  const Sidebar({Key? key, required String profileImageUrl, required String userName}) : super(key: key);
+  const Sidebar({Key? key, required String profileImagePath, required String userName}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      shape: const BeveledRectangleBorder(borderRadius: BorderRadius.all( Radius.circular(0.5))),
+      shape: const BeveledRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(0.5))),
       child: Consumer<SidebarProvider>(
         builder: (context, sidebarProvider, child) {
           return ListView(
@@ -69,19 +69,17 @@ class Sidebar extends StatelessWidget {
   }
 
   Widget _buildHeader(SidebarProvider sidebarProvider) {
-    final profileImageUrl = sidebarProvider.profileImageUrl;
+    final profileImagePath = sidebarProvider.profileImagePath;
     ImageProvider<Object> imageProvider;
 
-    if (profileImageUrl.isNotEmpty) {
-      if (profileImageUrl.startsWith('/data/user') ||
-          profileImageUrl.startsWith('file://')) {
-        final file = File(profileImageUrl.startsWith('file://')
-            ? profileImageUrl.replaceFirst('file://', '')
-            : profileImageUrl);
+    if (profileImagePath.isNotEmpty) {
+      if (profileImagePath.startsWith('/data/user') || profileImagePath.startsWith('file://')) {
+        final file = File(profileImagePath.startsWith('file://')
+            ? profileImagePath.replaceFirst('file://', '')
+            : profileImagePath);
         imageProvider = FileImage(file);
-      } else if (profileImageUrl.startsWith('http://') ||
-          profileImageUrl.startsWith('https://')) {
-        imageProvider = NetworkImage(profileImageUrl);
+      } else if (profileImagePath.startsWith('http://') || profileImagePath.startsWith('https://')) {
+        imageProvider = NetworkImage(profileImagePath);
       } else {
         imageProvider = const AssetImage('assets/S.png');
       }
@@ -110,7 +108,7 @@ class Sidebar extends StatelessWidget {
         radius: 40,
         backgroundColor: Colors.white, // Optional: Add a white background
         backgroundImage: imageProvider,
-        child: profileImageUrl.isEmpty
+        child: profileImagePath.isEmpty
             ? const Icon(Icons.person, size: 0.0001, color: Colors.transparent)
             : null,
       ),
@@ -141,21 +139,19 @@ class Sidebar extends StatelessWidget {
       child: ElevatedButton(
         onPressed: () => _logout(context),
         style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.redAccent,
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30))),
+          backgroundColor: Colors.redAccent,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+        ),
         child: Text(
           'Logout',
-          style: GoogleFonts.poppins(
-              fontWeight: FontWeight.bold, color: Colors.white),
+          style: GoogleFonts.poppins(fontWeight: FontWeight.bold, color: Colors.white),
         ),
       ),
     );
   }
 
   Future<void> _logout(BuildContext context) async {
-    final sidebarProvider =
-        Provider.of<SidebarProvider>(context, listen: false);
+    final sidebarProvider = Provider.of<SidebarProvider>(context, listen: false);
 
     await FirebaseAuth.instance.signOut();
     sidebarProvider.logout();

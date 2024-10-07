@@ -5,11 +5,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class SidebarProvider with ChangeNotifier {
-  String _profileImageUrl = '';
+  String _profileImagePath = '';
   String _userName = 'Guest';
   bool _isLoading = true;
+  bool _isDisposed = false;
 
-  String get profileImageUrl => _profileImageUrl;
+  String get profileImagePath => _profileImagePath;
   String get userName => _userName;
   bool get isLoading => _isLoading;
   bool get isGuestUser => _userName == 'Guest';
@@ -28,47 +29,61 @@ class SidebarProvider with ChangeNotifier {
 
   Future<void> _updateUserData() async {
     _isLoading = true;
-    notifyListeners();
+    _notifyListenersSafely();
 
     try {
       User? user = FirebaseAuth.instance.currentUser;
+
       if (user != null) {
-        // Fetch user data from Firestore
         DocumentReference userRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
-        
         DocumentSnapshot userDataSnapshot = await userRef.get();
 
         if (userDataSnapshot.exists) {
-          // Check and retrieve profile image and name from Firestore
           Map<String, dynamic>? userData = userDataSnapshot.data() as Map<String, dynamic>?;
 
-          _profileImageUrl = userData?['profileImageUrl'] ?? '';
+          _profileImagePath = userData?['profileImagePath'] ?? '';
           _userName = userData?['name'] ?? 'User';
-          print('Fetched user data - Name: $_userName, Image: $_profileImageUrl'); // Debug log
+
+          print('Fetched user data - Name: $_userName, Image: $_profileImagePath');
         } else {
-          print('User data not found in Firestore'); // Debug log
-          _profileImageUrl = '';
+          print('User data not found in Firestore');
+          _profileImagePath = '';
           _userName = 'User';
         }
       } else {
-        print('No current user found'); // Debug log
-        _profileImageUrl = '';
+        print('No current user found');
+        _profileImagePath = '';
         _userName = 'Guest';
       }
     } catch (e) {
       print('Error updating user data: $e');
+      _profileImagePath = '';
       _userName = 'Guest';
-      _profileImageUrl = '';
     } finally {
-      _isLoading = false;
-      notifyListeners();
+      // Ensure to only notify if not disposed
+      if (!_isDisposed) {
+        _isLoading = false;
+        notifyListeners();
+      }
     }
   }
 
   void logout() {
-    _profileImageUrl = '';
+    _profileImagePath = '';
     _userName = 'Guest';
     _isLoading = false;
-    notifyListeners();
+    _notifyListenersSafely();
+  }
+
+  void _notifyListenersSafely() {
+    if (!_isDisposed) {
+      notifyListeners();
+    }
+  }
+
+  @override
+  void dispose() {
+    _isDisposed = true; // Mark as disposed
+    super.dispose(); // Call super.dispose()
   }
 }
