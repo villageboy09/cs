@@ -6,6 +6,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart'; // Import dotenv package
 import 'package:http/http.dart' as http;
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:intl/intl.dart';
 
 class WeatherProvider with ChangeNotifier {
   Map<String, dynamic> _currentWeather = {};
@@ -31,7 +32,7 @@ class WeatherProvider with ChangeNotifier {
       }
 
       // Fetch the current location
-      Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.best);
       double latitude = position.latitude;
       double longitude = position.longitude;
 
@@ -48,10 +49,20 @@ class WeatherProvider with ChangeNotifier {
       final url = 'https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/$latitude,$longitude?unitGroup=metric&key=$apiKey&contentType=json';
       final response = await http.get(Uri.parse(url));
 
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        var today = data['days'][0];
-        var currentHour = today['hours'][0];
+          if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      var today = data['days'][0];
+      List<dynamic> hours = today['hours'] ?? [];
+
+      // Get the current time
+      String currentHourString = DateFormat('HH:00:00').format(DateTime.now());
+
+      // Find the hour that matches the current time
+      var currentHour = hours.firstWhere(
+        (hour) => hour['datetime'] == currentHourString,
+        orElse: () => hours.first, // Fallback to the first hour if not found
+      );
+
 
         _currentWeather = {
           'temp': currentHour['temp'] ?? 'N/A',

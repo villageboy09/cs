@@ -11,14 +11,22 @@ class WeatherPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Consumer<WeatherProvider>(
-        builder: (context, weatherProvider, child) {
-          if (weatherProvider.currentWeather.isEmpty) {
-            return _buildInitialView(context, weatherProvider);
-          } else {
-            return _buildWeatherView(context, weatherProvider);
-          }
+      body:  RefreshIndicator(
+        onRefresh: () async {
+          // Obtain the WeatherProvider instance from the context
+          final weatherProvider =
+              Provider.of<WeatherProvider>(context, listen: false);
+          await weatherProvider.fetchWeather(); // Fetch updated weather data
         },
+        child: Consumer<WeatherProvider>(
+          builder: (context, weatherProvider, child) {
+            if (weatherProvider.currentWeather.isEmpty) {
+              return _buildInitialView(context, weatherProvider);
+            } else {
+              return _buildWeatherView(context, weatherProvider);
+            }
+          },
+        ),
       ),
     );
   }
@@ -245,35 +253,59 @@ class WeatherPage extends StatelessWidget {
     );
   }
 
-    IconData _getWeatherIcon(String? condition) {
-    if (condition == null || condition.isEmpty) {
-      return FontAwesomeIcons.circleQuestion;
-    }
-    List conditions = condition.toLowerCase().split(',').map((e) => e.trim()).toList();
-    final Map conditionIcons = {
-      'rain': FontAwesomeIcons.cloudRain,
-      'partly cloudy': FontAwesomeIcons.cloudSun,
-      'sunny': FontAwesomeIcons.sun,
-      'cloudy': FontAwesomeIcons.cloud,
-      'snow': FontAwesomeIcons.snowflake,
-      'thunderstorm': FontAwesomeIcons.bolt,
-      'overcast': FontAwesomeIcons.cloud,
-    };
-    final Map conditionKeywords = {
-      'partially cloudy': 'partly cloudy',
-      'overcast': 'overcast',
-    };
-
-    for (String cond in conditions) {
-      for (String keyword in conditionKeywords.keys) {
-        if (cond.contains(keyword)) {
-          cond = conditionKeywords[keyword]!;
-          if (conditionIcons.containsKey(cond)) {
-            return conditionIcons[cond]!;
-          }
-        }
-      }
-    }
+   IconData _getWeatherIcon(String? condition) {
+  if (condition == null || condition.isEmpty) {
     return FontAwesomeIcons.circleQuestion;
   }
-} 
+
+  List<String> conditions = condition.toLowerCase().split(',').map((e) => e.trim()).toList();
+
+  final Map<String, IconData> conditionIcons = {
+    'rain': FontAwesomeIcons.cloudRain,
+    'partly cloudy': FontAwesomeIcons.cloudSun,
+    'sunny': FontAwesomeIcons.sun,
+    'cloudy': FontAwesomeIcons.cloud,
+    'snow': FontAwesomeIcons.snowflake,
+    'thunderstorm': FontAwesomeIcons.bolt,
+    'overcast': FontAwesomeIcons.cloud,
+    'snow-showers-day': FontAwesomeIcons.snowflake,
+    'snow-showers-night': FontAwesomeIcons.snowflake,
+    'thunder-rain': FontAwesomeIcons.cloudBolt,
+    'thunder-showers-day': FontAwesomeIcons.cloudBolt,
+    'thunder-showers-night': FontAwesomeIcons.cloudBolt,
+    'showers-day': FontAwesomeIcons.cloudRain,
+    'showers-night': FontAwesomeIcons.cloudRain,
+    'fog': FontAwesomeIcons.smog,
+    'wind': FontAwesomeIcons.wind,
+    'partly-cloudy-day': FontAwesomeIcons.cloudSun,
+    'partly-cloudy-night': FontAwesomeIcons.cloudMoon,
+    'clear-day': FontAwesomeIcons.sun,
+    'clear-night': FontAwesomeIcons.moon,
+    'clear': FontAwesomeIcons.sun,
+  };
+
+  final Map<String, String> conditionKeywords = {
+    'partially cloudy': 'partly cloudy',
+    'overcast': 'overcast',
+    'light rain': 'rain',
+    'light snow': 'snow',
+    'heavy snow': 'snow',
+    'heavy rain': 'rain',
+  };
+
+  // Match condition to an icon
+  for (String condition in conditions) {
+    // Check for any keyword mapping first
+    if (conditionKeywords.containsKey(condition)) {
+      condition = conditionKeywords[condition]!;
+    }
+    // Return the corresponding icon if available
+    if (conditionIcons.containsKey(condition)) {
+      return conditionIcons[condition]!;
+    }
+  }
+
+  // Default to a question mark if no match is found
+  return FontAwesomeIcons.circleQuestion;
+}
+}

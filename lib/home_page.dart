@@ -4,6 +4,7 @@ import 'package:cropsync/controller/weather.dart';
 import 'package:cropsync/users/sidebar.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
@@ -16,7 +17,8 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin {
+class _HomePageState extends State<HomePage>
+    with AutomaticKeepAliveClientMixin {
   final ScrollController _scrollController = ScrollController();
 
   @override
@@ -31,6 +33,23 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
   void dispose() {
     _scrollController.dispose();
     super.dispose();
+    _requestPermission();
+  }
+    Future<void> _requestPermission() async {
+    await _requestLocationPermission();
+  }
+
+
+  Future<void> _requestLocationPermission() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission != LocationPermission.whileInUse &&
+          permission != LocationPermission.always) {
+        print("Location permission denied.");
+        // Handle denied permission gracefully.
+      }
+    }
   }
 
   @override
@@ -52,16 +71,27 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
           ),
         ],
       ),
-      drawer: const Sidebar( userName: '', profileImagePath: '',),
-      body: CustomScrollView(
-        controller: _scrollController,
-        physics: const ClampingScrollPhysics(),
-        slivers: [
-          SliverToBoxAdapter(child: _buildCurrentWeatherWidget(context)),
-          SliverToBoxAdapter(child: _buildServicesSection(context)),
-          SliverToBoxAdapter(child: _buildStatsSection(context)),
-          SliverToBoxAdapter(child: _buildAboutUsSection(context)),
-        ],
+      drawer: const Sidebar(
+        userName: '',
+        profileImagePath: '',
+      ),
+      body: RefreshIndicator(
+        onRefresh: () async {
+          // Obtain the WeatherProvider instance from the context
+          final weatherProvider =
+              Provider.of<WeatherProvider>(context, listen: false);
+          await weatherProvider.fetchWeather(); // Fetch updated weather data
+        },
+        child: CustomScrollView(
+          controller: _scrollController,
+          physics: const ClampingScrollPhysics(),
+          slivers: [
+            SliverToBoxAdapter(child: _buildCurrentWeatherWidget(context)),
+            SliverToBoxAdapter(child: _buildServicesSection(context)),
+            SliverToBoxAdapter(child: _buildStatsSection(context)),
+            SliverToBoxAdapter(child: _buildAboutUsSection(context)),
+          ],
+        ),
       ),
     );
   }
@@ -168,8 +198,11 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
     if (condition == null || condition.isEmpty) {
       return FontAwesomeIcons.circleQuestion;
     }
-    List conditions = condition.toLowerCase().split(',').map((e) => e.trim()).toList();
-    final Map conditionIcons = {
+
+    List<String> conditions =
+        condition.toLowerCase().split(',').map((e) => e.trim()).toList();
+
+    final Map<String, IconData> conditionIcons = {
       'rain': FontAwesomeIcons.cloudRain,
       'partly cloudy': FontAwesomeIcons.cloudSun,
       'sunny': FontAwesomeIcons.sun,
@@ -177,59 +210,86 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin 
       'snow': FontAwesomeIcons.snowflake,
       'thunderstorm': FontAwesomeIcons.bolt,
       'overcast': FontAwesomeIcons.cloud,
+      'snow-showers-day': FontAwesomeIcons.snowflake,
+      'snow-showers-night': FontAwesomeIcons.snowflake,
+      'thunder-rain': FontAwesomeIcons.cloudBolt,
+      'thunder-showers-day': FontAwesomeIcons.cloudBolt,
+      'thunder-showers-night': FontAwesomeIcons.cloudBolt,
+      'showers-day': FontAwesomeIcons.cloudRain,
+      'showers-night': FontAwesomeIcons.cloudRain,
+      'fog': FontAwesomeIcons.smog,
+      'wind': FontAwesomeIcons.wind,
+      'partly-cloudy-day': FontAwesomeIcons.cloudSun,
+      'partly-cloudy-night': FontAwesomeIcons.cloudMoon,
+      'clear-day': FontAwesomeIcons.sun,
+      'clear-night': FontAwesomeIcons.moon,
+      'clear': FontAwesomeIcons.sun,
     };
-    final Map conditionKeywords = {
+
+    final Map<String, String> conditionKeywords = {
       'partially cloudy': 'partly cloudy',
       'overcast': 'overcast',
+      'light rain': 'rain',
+      'light snow': 'snow',
+      'heavy snow': 'snow',
+      'heavy rain': 'rain',
     };
 
-    for (String cond in conditions) {
-      for (String keyword in conditionKeywords.keys) {
-        if (cond.contains(keyword)) {
-          cond = conditionKeywords[keyword]!;
-          if (conditionIcons.containsKey(cond)) {
-            return conditionIcons[cond]!;
-          }
-        }
+    // Match condition to an icon
+    for (String condition in conditions) {
+      // Check for any keyword mapping first
+      if (conditionKeywords.containsKey(condition)) {
+        condition = conditionKeywords[condition]!;
+      }
+      // Return the corresponding icon if available
+      if (conditionIcons.containsKey(condition)) {
+        return conditionIcons[condition]!;
       }
     }
+
+    // Default to a question mark if no match is found
     return FontAwesomeIcons.circleQuestion;
   }
+}
 
-  Widget _buildShimmerWeather() {
-    return Shimmer.fromColors(
-      baseColor: Colors.grey[300]!,
-      highlightColor: Colors.grey[100]!,
-      child: Card(
-        margin: const EdgeInsets.all(16),
-        elevation: 4,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        child: const SizedBox(height: 150),
-      ),
-    );
-  }
+Widget _buildShimmerWeather() {
+  return Shimmer.fromColors(
+    baseColor: Colors.grey[300]!,
+    highlightColor: Colors.grey[100]!,
+    child: Card(
+      margin: const EdgeInsets.all(16),
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      child: const SizedBox(height: 150),
+    ),
+  );
+}
 
 Widget _buildServicesSection(BuildContext context) {
   final services = [
     {
       'icon': Icons.landscape,
       'name': 'Soil Analysis',
-      'description': 'Optimize your soil health'
+      'description': 'Optimize your soil health',
+      'route': '/catolouge',  // Add route for navigation
     },
     {
       'icon': Icons.eco,
       'name': 'Crop Advisory',
-      'description': 'Expert guidance for better yields'
+      'description': 'Expert guidance for better yields',
+      'route': '/advisory',  // Add route for navigation
     },
     {
       'icon': Icons.pest_control,
       'name': 'Pest Detection',
-      'description': 'Keep your crops safe'
+      'description': 'Keep your crops safe',
+      'route': '/contact',  // Add route for navigation
     },
     {
       'icon': Icons.cloud,
       'name': 'Weather Forecast',
-      'description': 'Stay updated'
+      'description': 'Stay updated',
+      'route': '/weather',  // Add route for navigation
     },
   ];
 
@@ -267,7 +327,8 @@ Widget _buildServicesSection(BuildContext context) {
         LayoutBuilder(
           builder: (context, constraints) {
             final screenWidth = constraints.maxWidth;
-            final isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+            final isLandscape =
+                MediaQuery.of(context).orientation == Orientation.landscape;
 
             double childAspectRatio;
             double fontSize;
@@ -285,7 +346,8 @@ Widget _buildServicesSection(BuildContext context) {
 
             return GridView.builder(
               shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(), // Keep this as is if you want to disable scrolling
+              physics:
+                  const NeverScrollableScrollPhysics(), // Keep this as is if you want to disable scrolling
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
                 childAspectRatio: childAspectRatio,
@@ -295,7 +357,7 @@ Widget _buildServicesSection(BuildContext context) {
               itemCount: services.length,
               itemBuilder: (BuildContext context, int index) {
                 final service = services[index];
-                return _buildServiceCard(service, fontSize);
+                return _buildServiceCard(service, fontSize, context);
               },
             );
           },
@@ -305,53 +367,59 @@ Widget _buildServicesSection(BuildContext context) {
   );
 }
 
-Widget _buildServiceCard(Map service, double fontSize) {
-  return Card(
-    elevation: 4,
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-    child: Padding(
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.green[50],
-              shape: BoxShape.circle,
+Widget _buildServiceCard(Map service, double fontSize, BuildContext context) {
+  return GestureDetector(
+    onTap: () {
+      Navigator.pushNamed(context, service['route']); // Navigate to the specified route
+    },
+    child: Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.green[50],
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                service['icon'] as IconData,
+                size: 32,
+                color: Colors.green[700],
+              ),
             ),
-            child: Icon(
-              service['icon'] as IconData,
-              size: 32,
-              color: Colors.green[700],
+            const SizedBox(height: 8),
+            Text(
+              service['name'] as String,
+              style: GoogleFonts.poppins(
+                fontSize: fontSize,
+                fontWeight: FontWeight.bold,
+                color: Colors.green[800],
+              ),
+              textAlign: TextAlign.center,
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            service['name'] as String,
-            style: GoogleFonts.poppins(
-              fontSize: fontSize,
-              fontWeight: FontWeight.bold,
-              color: Colors.green[800],
+            const SizedBox(height: 4),
+            Text(
+              service['description'] as String,
+              style: GoogleFonts.poppins(
+                fontSize: fontSize - 2,
+                color: Colors.green[600],
+              ),
+              textAlign: TextAlign.center,
             ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            service['description'] as String,
-            style: GoogleFonts.poppins(
-              fontSize: fontSize - 2,
-              color: Colors.green[600],
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
+          ],
+        ),
       ),
     ),
   );
 }
 
- Widget _buildStatsSection(BuildContext context) {
+
+Widget _buildStatsSection(BuildContext context) {
   final stats = [
     {'name': 'Farmers Reached', 'value': 2500},
     {'name': 'Crops Analyzed', 'value': 50},
@@ -418,6 +486,7 @@ Widget _buildServiceCard(Map service, double fontSize) {
     ),
   );
 }
+
 Widget _buildStatCard(Map stat) {
   return Container(
     decoration: BoxDecoration(
@@ -434,7 +503,8 @@ Widget _buildStatCard(Map stat) {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              FittedBox( // Wrap text in FittedBox
+              FittedBox(
+                // Wrap text in FittedBox
                 child: Text(
                   '${stat['value']}',
                   style: GoogleFonts.poppins(
@@ -445,7 +515,8 @@ Widget _buildStatCard(Map stat) {
                 ),
               ),
               const SizedBox(height: 4), // Reduced spacing
-              FittedBox( // Wrap text in FittedBox
+              FittedBox(
+                // Wrap text in FittedBox
                 child: Text(
                   stat['name'] as String,
                   style: GoogleFonts.poppins(
@@ -464,30 +535,29 @@ Widget _buildStatCard(Map stat) {
   );
 }
 
-  Widget _buildAboutUsSection(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      color: const Color(0xFFF9FBE7),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'About CropSync',
-            style: GoogleFonts.poppins(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
+Widget _buildAboutUsSection(BuildContext context) {
+  return Container(
+    padding: const EdgeInsets.all(16),
+    color: const Color(0xFFF9FBE7),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'About CropSync',
+          style: GoogleFonts.poppins(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
           ),
-          const SizedBox(height: 16),
-          Text(
-            'At CropSync, we are dedicated to helping farmers optimize their crop yields with cutting-edge technology. From soil analysis to pest detection, our services are designed to provide actionable insights to improve farming efficiency.',
-            style: GoogleFonts.poppins(
-              fontSize: 16,
-              color: Colors.grey[600],
-            ),
+        ),
+        const SizedBox(height: 16),
+        Text(
+          'At CropSync, we are dedicated to helping farmers optimize their crop yields with cutting-edge technology. From soil analysis to pest detection, our services are designed to provide actionable insights to improve farming efficiency.',
+          style: GoogleFonts.poppins(
+            fontSize: 16,
+            color: Colors.grey[600],
           ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
 }

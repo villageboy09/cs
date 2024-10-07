@@ -3,12 +3,15 @@
 import 'package:cropsync/bottm_nav_bar.dart';
 import 'package:cropsync/contact_us.dart';
 import 'package:cropsync/controller/language_change_controller.dart';
+import 'package:cropsync/controller/weather.dart';
 import 'package:cropsync/controller/weather_provider.dart';
 import 'package:cropsync/courses/agronomist.dart';
 import 'package:cropsync/courses/courses_page.dart';
+import 'package:cropsync/crop_advisory/advisory.dart';
 import 'package:cropsync/firebase_options.dart';
 import 'package:cropsync/controller/fireabse.dart';
 import 'package:cropsync/home_page.dart';
+import 'package:cropsync/products/catologue.dart';
 import 'package:cropsync/users/auth_provider.dart';
 import 'package:cropsync/users/authentication.dart';
 import 'package:cropsync/users/dashboard.dart';
@@ -107,6 +110,9 @@ class MyApp extends StatelessWidget {
             '/login': (context) => const LoginScreen(),
             '/contact': (context) => const ContactUsPage(),
             '/privacy': (context) => const PrivacyPolicyPage(privacyPolicyText: '', websiteUrl: '',),
+            '/catolouge': (context) => const ProductCatalogPage(),
+            '/advisory': (context) => const CropAdvisoryPage(),
+            '/weather': (context) => const WeatherPage(),
           },
           builder: (context, child) {
             return Stack(
