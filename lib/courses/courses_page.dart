@@ -6,6 +6,7 @@ import 'package:cropsync/users/sidebar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'course_card.dart'; // Import the course card widget
 
@@ -28,21 +29,32 @@ class CoursesPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.teal,
+        backgroundColor: Colors.green[50],
         elevation: 0,
         title: Text(
           'Courses',
-          style: GoogleFonts.poppins(fontWeight: FontWeight.bold, color: Colors.white),
+          style: GoogleFonts.poppins(fontWeight: FontWeight.bold, color: Colors.black),
         ),
         centerTitle: true,
+        actions: [
+          Image.asset(
+            'assets/S.png',
+            width: 48,
+            height: 48,
+          ),
+        ],
       ),
+      
       drawer: const Sidebar( userName: '', profileImagePath: '',),
 
       body: FutureBuilder<List<String>>(
         future: _getEnrolledCourses(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return Center(child: Lottie.asset(
+                  'assets/1.json',
+                  height: 250
+                ),);
           }
           if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
@@ -53,7 +65,10 @@ class CoursesPage extends StatelessWidget {
             stream: FirebaseFirestore.instance.collection('courses').snapshots(),
             builder: (context, courseSnapshot) {
               if (courseSnapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
+                return Center(child: Lottie.asset(
+                  'assets/1.json',
+                  height: 40
+                ),);
               }
               if (courseSnapshot.hasError) {
                 return Center(child: Text('Error: ${courseSnapshot.error}'));

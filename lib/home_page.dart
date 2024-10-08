@@ -280,10 +280,10 @@ Widget _buildServicesSection(BuildContext context) {
       'route': '/advisory',  // Add route for navigation
     },
     {
-      'icon': Icons.pest_control,
-      'name': 'Pest Detection',
-      'description': 'Keep your crops safe',
-      'route': '/contact',  // Add route for navigation
+      'icon': Icons.video_library,
+      'name': 'Video Courses',
+      'description': 'Virtual job simulations',
+      'route': '/courses',  // Add route for navigation
     },
     {
       'icon': Icons.cloud,

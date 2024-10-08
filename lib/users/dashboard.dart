@@ -405,41 +405,105 @@ Widget _buildProfileSection() {
     return null; // Return null if no image is available
   }
 
-  Widget _buildEnrolledCoursesSection() {
-    final user = FirebaseAuth.instance.currentUser;
+ Widget _buildEnrolledCoursesSection() {
+  final user = FirebaseAuth.instance.currentUser;
 
-    return StreamBuilder<DocumentSnapshot>(
-      stream: _firestore.collection('users').doc(user!.uid).snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
+  return StreamBuilder<DocumentSnapshot>(
+    stream: _firestore.collection('users').doc(user!.uid).snapshots(),
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return const Center(child: CircularProgressIndicator());
+      }
 
-        if (snapshot.hasError) {
-          return Center(child: Text('Error loading courses', style: GoogleFonts.poppins(color: Colors.red)));
-        }
-
-        final userData = snapshot.data?.data() as Map<String, dynamic>? ?? {};
-        final enrolledCourses = userData['enrolledCourses'] as List<dynamic>? ?? [];
-
-        return Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            color: Colors.white,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Enrolled Courses', style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 16),
-              ...enrolledCourses.map((course) => Text(course.toString(), style: GoogleFonts.poppins(fontSize: 16))).toList(),
-              if (enrolledCourses.isEmpty)
-                Text('No enrolled courses yet.', style: GoogleFonts.poppins(color: Colors.grey)),
-            ],
+      if (snapshot.hasError) {
+        return Center(
+          child: Text(
+            'Error loading courses',
+            style: GoogleFonts.poppins(
+              color: Colors.red,
+              fontSize: 16,
+            ),
           ),
         );
-      },
-    );
-  }
+      }
+
+      final userData = snapshot.data?.data() as Map<String, dynamic>? ?? {};
+      final enrolledCourses = userData['enrolledCourses'] as List<dynamic>? ?? [];
+
+      return Container(
+        padding: const EdgeInsets.all(24),
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(24),
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(Icons.school, color: Colors.blue, size: 24),
+                const SizedBox(width: 8),
+                Text(
+                  'Enrolled Courses',
+                  style: GoogleFonts.poppins(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue.shade800,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            if (enrolledCourses.isNotEmpty)
+              ListView.separated(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: enrolledCourses.length,
+                separatorBuilder: (context, index) => const Divider(
+                  height: 16,
+                  thickness: 0.5,
+                  color: Colors.grey,
+                ),
+                itemBuilder: (context, index) {
+                  final course = enrolledCourses[index];
+                  return Container(
+                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: Colors.blue.shade50,
+                    ),
+                    child: Text(
+                      course.toString(),
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        color: Colors.blue.shade700,
+                      ),
+                    ),
+                  );
+                },
+              )
+            else
+              Center(
+                child: Text(
+                  'No enrolled courses yet.',
+                  style: GoogleFonts.poppins(
+                    color: Colors.grey,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+          ],
+        ),
+      );
+    },
+  );
+}
 }

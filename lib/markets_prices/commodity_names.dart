@@ -7,21 +7,13 @@ class CommodityDetailsPage extends StatelessWidget {
   final List<String> commodityNames; // List of commodity names for the state
   final List<Map<String, dynamic>> relatedRows;
 
-  CommodityDetailsPage({
+  const CommodityDetailsPage({
     Key? key,
     required this.stateName,
     required this.commodityNames,
     required this.relatedRows,
   }) : super(key: key);
 
-  // Placeholder image URLs for commodities
-  final Map<String, String> commodityImages = {
-    'Paddy(Dhan)(Common)': 'https://example.com/images/paddy.png',
-    'Banana': 'https://picsum.photos/200/300',
-    'Capsicum': 'https://example.com/images/capsicum.png',
-    'Lemon': 'https://example.com/images/lemon.png',
-    // Add more commodities and their image URLs here
-  };
 
   @override
   Widget build(BuildContext context) {
@@ -51,8 +43,7 @@ class CommodityDetailsPage extends StatelessWidget {
   }
 
   Widget _buildCommodityCard(BuildContext context, String commodityName) {
-    final imageUrl = commodityImages[commodityName] ??
-        'https://example.com/images/placeholder.png';
+    
 
     return GestureDetector(
       onTap: () {
@@ -79,14 +70,8 @@ class CommodityDetailsPage extends StatelessWidget {
             Expanded(
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8.0),
-                child: Image.network(
-                  imageUrl,
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                  errorBuilder: (context, error, stackTrace) {
-                    return const Center(
-                        child: Icon(Icons.error)); // Placeholder for error
-                  },
+                child: const Image(
+                 image:AssetImage("assets/log.png"),
                 ),
               ),
             ),

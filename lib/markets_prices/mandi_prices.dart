@@ -64,37 +64,42 @@ class _MandiPricesState extends State<MandiPrices> {
     super.dispose();
   }
 
-  Future<void> fetchMandiPrices() async {
-    if (_isDataFetched || !mounted) return; // Prevents unnecessary calls
+Future<void> fetchMandiPrices() async {
+  if (_isDataFetched || !mounted) return; // Prevents unnecessary calls
 
-    try {
+  try {
+    if (mounted) {
       setState(() {
         _isLoading = true; // Indicate loading
       });
-      final spreadsheet = await gsheets.spreadsheet(announcementsSheetId);
-      final worksheet = spreadsheet.worksheetByTitle('announcements');
-      announcementsRows = await worksheet?.values.map.allRows();
-      _isDataFetched = true; // Data fetched successfully
+    }
+    final spreadsheet = await gsheets.spreadsheet(announcementsSheetId);
+    final worksheet = spreadsheet.worksheetByTitle('announcements');
+    announcementsRows = await worksheet?.values.map.allRows();
+    _isDataFetched = true; // Data fetched successfully
 
-      if (mounted) {
-        setState(() {
-          _uniqueStates = getUniqueStates(); // Populate unique states
-        });
-      }
-    } catch (e) {
-      // Handle errors gracefully
-      if (mounted) {
-        print('Error fetching data: $e');
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error fetching data: $e')));
-      }
-    } finally {
+    if (mounted) {
+      setState(() {
+        _uniqueStates = getUniqueStates(); // Populate unique states
+      });
+    }
+  } catch (e) {
+    // Handle errors gracefully
+    if (mounted) {
+      print('Error fetching data: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error fetching data: $e')));
+    }
+  } finally {
+    if (mounted) {
       // Update loading state once done
       setState(() {
         _isLoading = false; // End loading
       });
     }
   }
+}
+
 
   List<String> getUniqueStates() {
     final Set<String> uniqueStates = {};
@@ -240,7 +245,7 @@ class _MandiPricesState extends State<MandiPrices> {
         child: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.teal.shade200, Colors.teal.shade100],
+              colors: [Colors.white, Colors.lightBlue.shade400],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
