@@ -7,11 +7,11 @@ class EventCard extends StatelessWidget {
   final String eventDateTime;
 
   const EventCard({
-    Key? key,
+    super.key,
     required this.eventName,
     required this.eventDescription,
     required this.eventDateTime,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

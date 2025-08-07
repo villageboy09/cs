@@ -1,4 +1,4 @@
-// ignore_for_file: library_private_types_in_public_api, non_constant_identifier_names, use_build_context_synchronously
+// ignore_for_file: library_private_types_in_public_api, non_constant_identifier_names, use_build_context_synchronously, use_super_parameters
 
 import 'dart:convert';
 
@@ -93,7 +93,7 @@ class SheetPage extends StatefulWidget {
         Worksheet? sheet = GSheetsController.worksheetByTitle(entry.key);
         if (sheet != null) {
           List<Map<String, String>>? rows = await sheet.values.map.allRows();
-          rows.forEach((row) {
+          rows?.forEach((row) {
             row['imagePath'] = entry.value[row.keys.first]!;
           });
           allRows.addAll(rows as Iterable<Map<String, dynamic>>);

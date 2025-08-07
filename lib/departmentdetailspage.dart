@@ -7,11 +7,11 @@ class DepartmentDetailsPage extends StatelessWidget {
   final Map<String, Map<String, dynamic>> additionalData;
 
   const DepartmentDetailsPage({
-    Key? key,
+    super.key,
     required this.cropname,
     required this.growingseason,
     required this.additionalData,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -8,7 +8,7 @@ import 'package:cropsync/users/sidebar_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class Sidebar extends StatelessWidget {
-  const Sidebar({Key? key, required String profileImagePath, required String userName}) : super(key: key);
+  const Sidebar({super.key, required String profileImagePath, required String userName});
 
   @override
   Widget build(BuildContext context) {

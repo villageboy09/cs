@@ -6,7 +6,7 @@ import 'package:url_launcher/url_launcher_string.dart';
 
 
 class ContactUsPage extends StatefulWidget {
-  const ContactUsPage({Key? key}) : super(key: key);
+  const ContactUsPage({super.key});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -289,8 +289,8 @@ class SocialIconButton extends StatelessWidget {
     required this.imageUrl,
     required this.url,
     this.onTap,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context) {

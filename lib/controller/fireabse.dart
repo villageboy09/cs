@@ -7,7 +7,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class FirebaseMessagingInitializer extends StatefulWidget {
-  const FirebaseMessagingInitializer({Key? key}) : super(key: key);
+  const FirebaseMessagingInitializer({super.key});
 
   @override
   // ignore: library_private_types_in_public_api

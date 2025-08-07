@@ -9,7 +9,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:async';
 
 class CourseVideoPage extends StatefulWidget {
-  const CourseVideoPage({Key? key}) : super(key: key);
+  const CourseVideoPage({super.key});
 
   @override
   _CourseVideoPageState createState() => _CourseVideoPageState();

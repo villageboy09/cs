@@ -7,11 +7,11 @@ class CropCard extends StatefulWidget {
   final VoidCallback? onTap;
 
   const CropCard({
-    Key? key,
+    super.key,
     required this.imageUrl, // Changed from image to imageUrl
     required this.label,
     this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   // ignore: library_private_types_in_public_api
@@ -77,10 +77,10 @@ class CropDetailPage extends StatelessWidget {
   final List<String> imageUrls;
 
   const CropDetailPage({
-    Key? key,
+    super.key,
     required this.label,
     required this.imageUrls,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

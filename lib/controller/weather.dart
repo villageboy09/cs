@@ -6,7 +6,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'weather_provider.dart';
 
 class WeatherPage extends StatelessWidget {
-  const WeatherPage({Key? key}) : super(key: key);
+  const WeatherPage({super.key});
 
   @override
   Widget build(BuildContext context) {

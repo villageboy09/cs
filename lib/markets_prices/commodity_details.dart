@@ -7,11 +7,11 @@ class SpecificCommodityDetailPage extends StatelessWidget {
   final List<Map<String, dynamic>> relatedRows;
 
   const SpecificCommodityDetailPage({
-    Key? key,
+    super.key,
     required this.commodityName,
     required this.stateName,
     required this.relatedRows,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

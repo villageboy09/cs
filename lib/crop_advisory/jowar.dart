@@ -1,13 +1,13 @@
 // ignore_for_file: library_private_types_in_public_api
 
+import 'package:cropsync/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:lottie/lottie.dart';
 
 class JowarDetailPage extends StatefulWidget {
-  const JowarDetailPage({Key? key}) : super(key: key);
+  const JowarDetailPage({super.key});
 
   @override
   _JowarDetailPageState createState() => _JowarDetailPageState();

@@ -9,13 +9,13 @@ class TextButtonWidget extends StatelessWidget {
   final Color color;
 
   const TextButtonWidget({
-    Key? key,
+    super.key,
     required this.text,
     required this.page,
     required this.fontSize,
     required this.fontWeight,
     required this.color,
-  }) : super(key: key);
+  });
   
   @override
   Widget build(BuildContext context) {

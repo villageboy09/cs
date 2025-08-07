@@ -6,11 +6,11 @@ class ReusableCard extends StatelessWidget {
   final VoidCallback onTap;
 
   const ReusableCard({
-    Key? key,
+    super.key,
     required this.imagePath,
     required this.title,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

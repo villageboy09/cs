@@ -10,7 +10,7 @@ import 'package:gsheets/gsheets.dart';
 import 'package:shimmer/shimmer.dart';
 
 class MandiPrices extends StatefulWidget {
-  const MandiPrices({Key? key}) : super(key: key);
+  const MandiPrices({super.key});
 
   @override
   _MandiPricesState createState() => _MandiPricesState();

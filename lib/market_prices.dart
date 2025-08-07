@@ -3,12 +3,12 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:cropsync/controller/veg_list.dart';
+import 'package:cropsync/l10n/app_localizations.dart';
 import 'package:cropsync/users/sidebar.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 void main() {
@@ -18,7 +18,7 @@ void main() {
 }
 
 class MarketpricesPage extends StatelessWidget {
-  const MarketpricesPage({Key? key}) : super(key: key);
+  const MarketpricesPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +43,7 @@ class MarketpricesPage extends StatelessWidget {
 }
 
 class MarketpricesForm extends StatefulWidget {
-  const MarketpricesForm({Key? key}) : super(key: key);
+  const MarketpricesForm({super.key});
 
   @override
   _MarketpricesFormState createState() => _MarketpricesFormState();

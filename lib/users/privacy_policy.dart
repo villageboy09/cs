@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 class PrivacyPolicyPage extends StatelessWidget {
-  const PrivacyPolicyPage({Key? key, required String privacyPolicyText, required String websiteUrl}) : super(key: key);
+  const PrivacyPolicyPage({super.key, required String privacyPolicyText, required String websiteUrl});
 
   @override
   Widget build(BuildContext context) {

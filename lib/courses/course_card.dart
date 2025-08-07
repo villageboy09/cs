@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -9,12 +11,12 @@ class CourseCard extends StatelessWidget {
   final String price;
 
   const CourseCard({
-    Key? key,
+    super.key,
     required this.imageUrl,
     required this.title,
     required this.description,
     required this.price, required List<String> enrolledCourses, required Null Function() onRequestPressed,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

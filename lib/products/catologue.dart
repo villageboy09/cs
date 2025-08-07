@@ -5,7 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:shimmer/shimmer.dart';
 
 class ProductCatalogPage extends StatelessWidget {
-  const ProductCatalogPage({Key? key}) : super(key: key);
+  const ProductCatalogPage({super.key});
 
   @override
   Widget build(BuildContext context) {

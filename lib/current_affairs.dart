@@ -11,7 +11,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:cropsync/users/sidebar.dart';
 
 class CurrentAffairsPage extends StatefulWidget {
-  const CurrentAffairsPage({Key? key}) : super(key: key);
+  const CurrentAffairsPage({super.key});
 
   @override
   _CurrentAffairsPageState createState() => _CurrentAffairsPageState();

@@ -9,7 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 class ProductDetailsPage extends StatefulWidget {
   final Product product;
 
-  const ProductDetailsPage({Key? key, required this.product}) : super(key: key);
+  const ProductDetailsPage({super.key, required this.product});
 
   @override
   _ProductDetailsPageState createState() => _ProductDetailsPageState();
