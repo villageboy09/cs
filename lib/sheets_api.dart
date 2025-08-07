@@ -93,7 +93,7 @@ class SheetPage extends StatefulWidget {
         Worksheet? sheet = GSheetsController.worksheetByTitle(entry.key);
         if (sheet != null) {
           List<Map<String, String>>? rows = await sheet.values.map.allRows();
-          rows?.forEach((row) {
+          rows.forEach((row) {
             row['imagePath'] = entry.value[row.keys.first]!;
           });
           allRows.addAll(rows as Iterable<Map<String, dynamic>>);
